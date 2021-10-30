@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-BUILD_BROKEN_DUP_RULES := true
+#BUILD_BROKEN_DUP_RULES := true
 
 BOARD_VENDOR := motorola
 
