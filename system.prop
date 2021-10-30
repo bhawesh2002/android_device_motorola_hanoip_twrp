@@ -1,0 +1,13 @@
+ro.product.vendor.marketname=Redmi Note 10 Pro
+ro.product.board=haniop
+ro.board.platform=sm6150
+sys.usb.controller=a600000.dwc3
+sys.usb.config=mtp,adb
+sys.usb.configfs=1
+sys.usb.ffs.ready=1
+sys.usb.mtp.device_type=3
+sys.usb.state=mtp,adb
+ro.boot.dynamic_partitions=true
+ro.adb.secure=1
+ro.crypto.volume.filenames_mode=aes-256-cts
+
