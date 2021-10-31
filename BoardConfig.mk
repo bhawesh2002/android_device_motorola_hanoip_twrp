@@ -57,6 +57,8 @@ TARGET_USES_QCOM_BSP := true
 # Kernel
 BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom androidboot.console=ttyMSM0 androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 androidboot.usbcontroller=a600000.dwc3 swiotlb=2048 loop.max_part=7 cgroup.memory=nokmem,nosocket reboot=panic_warm
 
+#BOARD_KERNEL_CMDLINE := rcupdate.rcu_expedited=1 rcu_nocbs=0-7 console=null androidboot.hardware=qcom androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=1 androidboot.usbcontroller=a600000.dwc3 loop.max_part=7 printk.devkmsg=on androidboot.hab.csv=5 androidboot.hab.product=hanoip androidboot.hab.cid=50 firmware_class.path=/vendor/firmware_mnt/image buildvariant=user quiet androidboot.verifiedbootstate=orange androidboot.keymaster=1 androidboot.vbmeta.device=PARTUUID=53fd77d8-b172-9209-9061-9355a75e8b9b androidboot.vbmeta.avb_version=1.0 androidboot.vbmeta.device_state=unlocked androidboot.vbmeta.hash_alg=sha256 androidboot.vbmeta.size=6464 androidboot.vbmeta.digest=94c13e24836a893accfd1a9883b9fe896cad58ad61387c0074250adb75a0a85a androidboot.vbmeta.invalidate_on_error=yes androidboot.veritymode=enforcing androidboot.bootdevice=1d84000.ufshc androidboot.fstab_suffix=default androidboot.boot_devices=soc/1d84000.ufshc androidboot.serialno=ZD22225KY8 androidboot.device=hanoip androidboot.revision=pvt androidboot.hwrev=0xC000 androidboot.radio=EUAPEML androidboot.powerup_reason=0x00004000 androidboot.bootreason=reboot msm_poweroff.download_mode=0 wifimacaddr=FC:D4:36:0D:3E:11,FC:D4:36:0D:3E:12 androidboot.btmacaddr=FC:D4:36:0D:3E:10 androidboot.bootloader=MBM-3.0-hanoip_retail-c29b299de02-210914 androidboot.carrier=retin androidboot.hardware.sku=XT2147-1 androidboot.mode=normal androidboot.baseband=msm msm_drm.dsi_display0=dsi_ili7807s_tm_678_vid_display: androidboot.slot_suffix=_a rootwait ro init=/init androidboot.dtbo_idx=0 androidboot.dtb_idx=0 androidboot.force_normal_boot=1 storage_mfrid=0 x1AD androidboot.dualsim=true androidboot.secure_hardware=1 androidboot.cid=0x0032 androidboot.write_protect=0 androidboot.bl_state=2 androidboot.ssm_data=00000000000F4441
+
 BOARD_KERNEL_IMAGE_NAME := Image.gz
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_BOOT_HEADER_VERSION := 3
@@ -162,13 +164,12 @@ TW_EXCLUDE_DEFAULT_USB_INIT := true
 TW_INCLUDE_NTFS_3G := true
 TW_INCLUDE_RESETPROP := true
 TW_INPUT_BLACKLIST := "hbtp_vm"
-TW_MAX_BRIGHTNESS := 300
-TW_DEFAULT_BRIGHTNESS := 180
+TW_MAX_BRIGHTNESS := 255
+TW_DEFAULT_BRIGHTNESS := 120
 TW_THEME := portrait_hdpi
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.0/lun.%d/file
 TW_NO_SCREEN_BLANK := true
 TW_NO_USB_STORAGE := true
-RECOVERY_TOUCHSCREEN_SWAP_XY := true
 
 BOARD_SUPPRESS_SECURE_ERASE := true
 TW_USE_TOOLBOX := true
