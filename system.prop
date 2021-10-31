@@ -1,4 +1,4 @@
-ro.product.vendor.marketname=Redmi Note 10 Pro
+ro.product.model=moto g(40) fusion
 ro.product.board=haniop
 ro.board.platform=sm6150
 sys.usb.controller=a600000.dwc3
