@@ -59,7 +59,7 @@ TARGET_USES_QCOM_BSP := true
 
 BOARD_KERNEL_CMDLINE := rcupdate.rcu_expedited=1 rcu_nocbs=0-7 console=null androidboot.hardware=qcom androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=1 androidboot.usbcontroller=a600000.dwc3 loop.max_part=7 printk.devkmsg=on androidboot.hab.csv=5 androidboot.hab.product=hanoip androidboot.hab.cid=50 firmware_class.path=/vendor/firmware_mnt/image buildvariant=user quiet androidboot.verifiedbootstate=orange androidboot.keymaster=1 androidboot.vbmeta.device=PARTUUID=53fd77d8-b172-9209-9061-9355a75e8b9b androidboot.vbmeta.avb_version=1.0 androidboot.vbmeta.device_state=unlocked androidboot.vbmeta.hash_alg=sha256 androidboot.vbmeta.size=6464 androidboot.vbmeta.digest=94c13e24836a893accfd1a9883b9fe896cad58ad61387c0074250adb75a0a85a androidboot.vbmeta.invalidate_on_error=yes androidboot.veritymode=enforcing androidboot.bootdevice=1d84000.ufshc androidboot.fstab_suffix=default androidboot.boot_devices=soc/1d84000.ufshc androidboot.serialno=ZD22225KY8 androidboot.device=hanoip androidboot.revision=pvt androidboot.hwrev=0xC000 androidboot.radio=EUAPEML androidboot.powerup_reason=0x00004000 androidboot.bootreason=reboot msm_poweroff.download_mode=0 wifimacaddr=FC:D4:36:0D:3E:11,FC:D4:36:0D:3E:12 androidboot.btmacaddr=FC:D4:36:0D:3E:10 androidboot.bootloader=MBM-3.0-hanoip_retail-c29b299de02-210914 androidboot.carrier=retin androidboot.hardware.sku=XT2147-1 androidboot.mode=normal androidboot.baseband=msm msm_drm.dsi_display0=dsi_ili7807s_tm_678_vid_display: androidboot.slot_suffix=_a rootwait ro init=/init androidboot.dtbo_idx=0 androidboot.dtb_idx=0 androidboot.force_normal_boot=1 storage_mfrid=0 x1AD androidboot.dualsim=true androidboot.secure_hardware=1 androidboot.cid=0x0032 androidboot.write_protect=0 androidboot.bl_state=2 androidboot.ssm_data=00000000000F4441
 
-BOARD_KERNEL_IMAGE_NAME := Image
+BOARD_KERNEL_IMAGE_NAME := Image.gz
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_BOOT_HEADER_VERSION := 2
 BOARD_KERNEL_BASE          := 0x00000000
@@ -71,8 +71,8 @@ BOARD_DTB_OFFSET           := 0x01f00000
 TARGET_KERNEL_ARCH := arm64
 TARGET_KERNEL_HEADER_ARCH := arm64
 
-#TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel 
-#BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo
+TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel 
+BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img
 #BOARD_PREBUILT_DTBIMAGE_DIR := $(DEVICE_PATH)/prebuilt/dtb
 
 TARGET_KERNEL_SOURCE := kernel/motorola/sm6150
@@ -95,6 +95,9 @@ BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 2
 BOARD_AVB_RECOVERY_ALGORITHM := SHA256_RSA4096
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
+
+#ASSERT
+TARGET_OTA_ASSERT_DEVICE := haniop	
 
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 262144 # (BOARD_KERNEL_PAGESIZE * 64)
