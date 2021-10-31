@@ -28,7 +28,7 @@ $(call inherit-product, device/motorola/haniop/device.mk)
 
 ## Device identifier. This must come after all inclusions
 PRODUCT_DEVICE := haniop
-PRODUCT_NAME := haniop
+PRODUCT_NAME := twrp_haniop
 PRODUCT_BRAND := motorola
 PRODUCT_MODEL := moto g(40) fusion
 PRODUCT_MANUFACTURER := motorola
