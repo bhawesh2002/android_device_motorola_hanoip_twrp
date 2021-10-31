@@ -15,8 +15,8 @@
 #
 
 # Release name
-PRODUCT_RELEASE_NAME := haniop
-DEVICE_PATH := device/motorola/haniop
+PRODUCT_RELEASE_NAME := hanoip
+DEVICE_PATH := device/motorola/hanoip
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base.mk)
 
@@ -24,11 +24,11 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base.mk)
 $(call inherit-product, vendor/twrp/config/common.mk)
 
 # Inherit device configuration
-$(call inherit-product, device/motorola/haniop/device.mk)
+$(call inherit-product, device/motorola/hanoip/device.mk)
 
 ## Device identifier. This must come after all inclusions
-PRODUCT_DEVICE := haniop
-PRODUCT_NAME := twrp_haniop
+PRODUCT_DEVICE := hanoip
+PRODUCT_NAME := twrp_hanoip
 PRODUCT_BRAND := motorola
 PRODUCT_MODEL := moto g(40) fusion
 PRODUCT_MANUFACTURER := motorola

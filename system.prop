@@ -1,5 +1,5 @@
 ro.product.model=moto g(40) fusion
-ro.product.board=haniop
+ro.product.board=hanoip
 ro.board.platform=sm6150
 sys.usb.controller=a600000.dwc3
 sys.usb.config=mtp,adb

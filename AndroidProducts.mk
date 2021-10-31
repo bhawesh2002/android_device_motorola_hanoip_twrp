@@ -15,8 +15,8 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/twrp_haniop.mk
+    $(LOCAL_DIR)/twrp_hanoip.mk
 
-COMMON_LUNCH_CHOICES := twrp_haniop-user
-COMMON_LUNCH_CHOICES := twrp_haniop-eng
-COMMON_LUNCH_CHOICES := twrp_haniop-userdebug
+COMMON_LUNCH_CHOICES := twrp_hanoip-user
+COMMON_LUNCH_CHOICES := twrp_hanoip-eng
+COMMON_LUNCH_CHOICES := twrp_hanoip-userdebug

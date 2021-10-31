@@ -3,7 +3,7 @@
 Device configuration for Motorola Moto g(40) Fusion/ g(60)
 =========================================
 
-The Motorola Moto g(40) Fusion/ g(60) (codenamed _"haniop"_) are mid range smartphones from Motorola.
+The Motorola Moto g(40) Fusion/ g(60) (codenamed _"hanoip"_) are mid range smartphones from Motorola.
 The device was announced on 2021, April 20 and released on 2021, May 01
 ## Device specifications
 
