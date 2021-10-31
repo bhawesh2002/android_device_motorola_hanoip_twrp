@@ -10,4 +10,3 @@ sys.usb.state=mtp,adb
 ro.boot.dynamic_partitions=true
 ro.adb.secure=1
 ro.crypto.volume.filenames_mode=aes-256-cts
-
