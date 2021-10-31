@@ -21,6 +21,3 @@ Display | 1080x2460 pixels, 6.8 inches, IPS LCD, 120Hz, HDR10 (~395 ppi density)
 ## Device picture
 
 ![Motorola Moto g(40) Fusion/ g(60)](https://fdn2.gsmarena.com/vv/pics/motorola/motorola-moto-g40-fusion-1.jpg)
-
-#### Proprietary-files.txt
-The Proprietary-files.txt is extracted from android_device_motorola_sm6150-common:-(https://github.com/sm6150-motorola/android_device_motorola_sm6150-common/blob/lineage-18.1/proprietary-files.txt)
