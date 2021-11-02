@@ -14,12 +14,19 @@
 # limitations under the License.
 #
 
+# define hardware platform
+PRODUCT_PLATFORM := sm6150
+
 # Display
 TARGET_SCREEN_HEIGHT := 2340
 TARGET_SCREEN_WIDTH := 1080
 
 #PRODUCT_SOONG_NAMESPACES += \
 #    vendor/qcom/opensource/commonsys-intf/display
+
+# Soong namespaces
+PRODUCT_SOONG_NAMESPACES += \
+    $(LOCAL_PATH)
 
 PRODUCT_PACKAGES += \
     qcom_decrypt \
@@ -37,12 +44,20 @@ TARGET_COPY_OUT_VENDOR := vendor
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
 # Crypto
-TW_INCLUDE_CRYPTO := true
-TW_INCLUDE_CRYPTO_FBE := true
-TW_INCLUDE_FBE_METADATA_DECRYPT := true
-PLATFORM_SECURITY_PATCH := 2099-12-31
-VENDOR_SECURITY_PATCH := 2099-12-31
-PLATFORM_VERSION := 16.1.0
+#TW_INCLUDE_CRYPTO := true
+#TW_INCLUDE_CRYPTO_FBE := true
+#TW_INCLUDE_FBE_METADATA_DECRYPT := true
+#PLATFORM_SECURITY_PATCH := 2099-12-31
+#VENDOR_SECURITY_PATCH := 2099-12-31
+#PLATFORM_VERSION := 16.1.0
+
+AB_OTA_PARTITIONS += \
+    boot \
+    dtbo \
+    product \
+    system \
+    vbmeta \
+    vendor
 
 # Recovery
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
@@ -69,6 +84,24 @@ TARGET_USES_LOGD := true
 TARGET_USES_MKE2FS := true
 TW_NO_SCREEN_BLANK := true
 TW_EXCLUDE_APEX := true
+
+# tell update_engine to not change dynamic partition table during updates
+# needed since our qti_dynamic_partitions does not include
+# vendor and odm and we also dont want to AB update them
+TARGET_ENFORCE_AB_OTA_PARTITION_LIST := true
+
+# Boot control HAL
+PRODUCT_PACKAGES += \
+    android.hardware.boot@1.0-impl \
+    android.hardware.boot@1.0-service \
+    android.hardware.boot@1.0-impl-wrapper.recovery \
+    android.hardware.boot@1.0-impl-wrapper \
+    android.hardware.boot@1.0-impl.recovery \
+
+# Apex libraries
+PRODUCT_HOST_PACKAGES += \
+    libandroidicu
+
 
 # Vibrator
 TW_SUPPORT_INPUT_AIDL_HAPTICS := true

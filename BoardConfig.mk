@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-#BUILD_BROKEN_DUP_RULES := true
+BUILD_BROKEN_DUP_RULES := true
 
 BOARD_VENDOR := motorola
 
@@ -107,10 +107,13 @@ BOARD_DTBOIMG_PARTITION_SIZE := 25165824
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 115921629184
 
 # Dynamic Partition
-BOARD_SUPER_PARTITION_SIZE := 10804527104
+BOARD_SUPER_PARTITION_SIZE := 9730785280
 BOARD_SUPER_PARTITION_GROUPS := qti_dynamic_partitions
 BOARD_QTI_DYNAMIC_PARTITIONS_SIZE := 4865392640
-BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := product vendor system system_ext odm
+BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := \
+    system \
+    product \
+    vendor
 
 BOARD_ROOT_EXTRA_FOLDERS := bluetooth dsp firmware persist
 BOARD_SUPPRESS_SECURE_ERASE := true
@@ -170,6 +173,9 @@ TW_THEME := portrait_hdpi
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.0/lun.%d/file
 TW_NO_SCREEN_BLANK := true
 TW_NO_USB_STORAGE := true
+
+# Extras
+TARGET_SYSTEM_PROP += $(PLATFORM_PATH)/system.prop
 
 BOARD_SUPPRESS_SECURE_ERASE := true
 TW_USE_TOOLBOX := true
