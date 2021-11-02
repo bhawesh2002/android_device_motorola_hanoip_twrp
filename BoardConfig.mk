@@ -38,6 +38,7 @@ TARGET_2ND_CPU_VARIANT_RUNTIME := cortex-a76
 TARGET_USES_64_BIT_BINDER := true
 TARGET_SUPPORTS_64_BIT_APPS := true
 
+#CPU sets
 ENABLE_CPUSETS := true
 ENABLE_SCHEDBOOST := true
 
@@ -75,7 +76,7 @@ TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img
 BOARD_PREBUILT_DTBIMAGE_DIR := $(DEVICE_PATH)/prebuilt/dtb
 
-#TARGET_KERNEL_SOURCE := kernel/motorola/sm6150
+TARGET_KERNEL_SOURCE := kernel/motorola/kernel_motorola_hanoip-twrp-10
 
 BOARD_INCLUDE_RECOVERY_DTBO := true
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
@@ -137,20 +138,20 @@ TARGET_USERIMAGES_USE_F2FS := true
 BOARD_USES_QCOM_FBE_DECRYPTION := true
 BOARD_USES_METADATA_PARTITION := true
 
-TW_RECOVERY_ADDITIONAL_RELINK_BINARY_FILES += \
-    $(TARGET_OUT_EXECUTABLES)/ashmemd
+#TW_RECOVERY_ADDITIONAL_RELINK_BINARY_FILES += \
+#    $(TARGET_OUT_EXECUTABLES)/ashmemd
 
-TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
-    $(TARGET_OUT_SHARED_LIBRARIES)/android.hidl.base@1.0.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/ashmemd_aidl_interface-cpp.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libashmemd_client.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libcap.so \
+#TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
+#    $(TARGET_OUT_SHARED_LIBRARIES)/android.hidl.base@1.0.so \
+#    $(TARGET_OUT_SHARED_LIBRARIES)/ashmemd_aidl_interface-cpp.so \
+#    $(TARGET_OUT_SHARED_LIBRARIES)/libashmemd_client.so \
+#    $(TARGET_OUT_SHARED_LIBRARIES)/libcap.so \
 #    $(TARGET_OUT_SHARED_LIBRARIES)/libicui18n.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libicuuc.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libion.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libpcrecpp.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libprocinfo.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libxml2.so
+#    $(TARGET_OUT_SHARED_LIBRARIES)/libicuuc.so \
+#    $(TARGET_OUT_SHARED_LIBRARIES)/libion.so \
+#    $(TARGET_OUT_SHARED_LIBRARIES)/libpcrecpp.so \
+#    $(TARGET_OUT_SHARED_LIBRARIES)/libprocinfo.so \
+#    $(TARGET_OUT_SHARED_LIBRARIES)/libxml2.so
     
 # A/B device flags
 TARGET_NO_KERNEL := false
@@ -170,6 +171,8 @@ TW_INPUT_BLACKLIST := "hbtp_vm"
 TW_MAX_BRIGHTNESS := 255
 TW_DEFAULT_BRIGHTNESS := 120
 TW_THEME := portrait_hdpi
+#TW_Y_OFFSET := 80
+#TW_X_OFFSET := 80
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.0/lun.%d/file
 TW_NO_SCREEN_BLANK := true
 TW_NO_USB_STORAGE := true
