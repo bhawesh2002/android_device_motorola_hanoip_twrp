@@ -1,11 +1,11 @@
 #
-# Copyright 2018 The Android Open Source Project
+# Copyright 2021 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,19 +16,16 @@
 
 # Release name
 PRODUCT_RELEASE_NAME := hanoip
-DEVICE_PATH := device/motorola/hanoip
-
-$(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base.mk)
 
 # Inherit from our custom product configuration
 $(call inherit-product, vendor/twrp/config/common.mk)
 
-# Inherit device configuration
-$(call inherit-product, device/motorola/hanoip/device.mk)
-
-## Device identifier. This must come after all inclusions
+# Device identifier. This must come after all inclusions
 PRODUCT_DEVICE := hanoip
-PRODUCT_NAME := twrp_hanoip
+PRODUCT_NAME := twrp_$(PRODUCT_DEVICE)
 PRODUCT_BRAND := motorola
-PRODUCT_MODEL := moto g(40) fusion
+PRODUCT_MODEL := motorola moto g(40) fusion
 PRODUCT_MANUFACTURER := motorola
+
+# Inherit from hardware-specific part of the product configuration
+$(call inherit-product, device/$(PRODUCT_BRAND)/$(PRODUCT_DEVICE)/device.mk)

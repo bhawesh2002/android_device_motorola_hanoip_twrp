@@ -1,12 +1,7 @@
-ro.product.model=moto g(40) fusion
 ro.product.board=hanoip
 ro.board.platform=sm6150
-sys.usb.controller=a600000.dwc3
-sys.usb.config=mtp,adb
-sys.usb.configfs=1
-sys.usb.ffs.ready=1
-sys.usb.mtp.device_type=3
-sys.usb.state=mtp,adb
+ro.product.system.brand=motorola
+ro.product.system.device=hanoip
+ro.product.system.manufacturer=motorola
 ro.boot.dynamic_partitions=true
-ro.adb.secure=1
-ro.crypto.volume.filenames_mode=aes-256-cts
+ro.boot.dynamic_partitions_retrofit=true
