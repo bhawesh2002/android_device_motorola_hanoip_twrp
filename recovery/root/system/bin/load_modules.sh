@@ -33,7 +33,6 @@ wait_for_poweron()
 # Load all needed modules
 insmod $module_path/sensors_class.ko
 insmod $module_path/fpc1020_mmi.ko
-insmod $module_path/goodix_fod_mmi.ko
 insmod $module_path/utags.ko
 insmod $module_path/exfat.ko
 insmod $module_path/mmi_annotate.ko
