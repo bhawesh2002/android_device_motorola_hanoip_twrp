@@ -29,6 +29,7 @@ AB_OTA_UPDATER := true
 # more partitions to this list for the bootloader and radio.
 AB_OTA_PARTITIONS += \
     boot \
+    vendor_boot \
     dtbo \
     product \
     recovery \
@@ -73,6 +74,7 @@ PRODUCT_HOST_PACKAGES += \
 
 # Dynamic partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
+PRODUCT_RETROFIT_DYNAMIC_PARTITIONS := true
 
 # qcom standard decryption
 PRODUCT_PACKAGES += \
