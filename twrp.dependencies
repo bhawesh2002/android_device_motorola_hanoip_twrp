@@ -5,4 +5,11 @@
     "target_path": "device/qcom/twrp-common",
     "revision":    "android-11"
   }
+  
+  {
+    "remote":      "bhawesh2002",
+    "repository":  "kernel_motorola_hanoip",
+    "target_path": "kernel/motorola/hanoip",
+    "revision":    "android-11"
+  }
 ]
