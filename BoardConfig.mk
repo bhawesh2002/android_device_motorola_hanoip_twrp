@@ -78,15 +78,16 @@ BOARD_DTB_OFFSET           := 0x0000000001f00000
 #BOARD_KERNEL_SEPARATED_DTBO := true
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 
-TARGET_KERNEL_SOURCE := kernel/motorola/hanoip
-TARGET_KERNEL_CONFIG := vendor/hanoip_defconfig
+#Include these lines in your code if you are building with the kernel sources
+#TARGET_KERNEL_SOURCE := kernel/motorola/hanoip
+#TARGET_KERNEL_CONFIG := vendor/hanoip_defconfig
 
 #TARGET_KERNEL_ADDITIONAL_FLAGS := \
 #    DTC=$(shell pwd)/$(PLATFORM_PATH)/dtc/dtc
 
-BOARD_KERNEL_IMAGE_NAME := Image.gz
-#TARGET_PREBUILT_DTB := $(PLATFORM_PATH)/prebuilt/dtb
-#TARGET_PREBUILT_KERNEL := $(PLATFORM_PATH)/prebuilt/$(BOARD_KERNEL_IMAGE_NAME)
+BOARD_KERNEL_IMAGE_NAME := kernel
+TARGET_PREBUILT_DTB := $(PLATFORM_PATH)/prebuilt/dtb
+TARGET_PREBUILT_KERNEL := $(PLATFORM_PATH)/prebuilt/$(BOARD_KERNEL_IMAGE_NAME)
 #BOARD_PREBUILT_DTBOIMAGE := $(PLATFORM_PATH)/prebuilt/dtbo.img
 
 TARGET_KERNEL_VERSION := 4.14.190
