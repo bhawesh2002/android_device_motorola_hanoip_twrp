@@ -5,3 +5,6 @@ ro.product.system.device=hanoip
 ro.product.system.manufacturer=motorola
 ro.boot.dynamic_partitions=true
 ro.boot.dynamic_partitions_retrofit=true
+sys.usb.state=mtp,adb
+sys.usb.config=mtp,adb
+ro.adb.secure=1
