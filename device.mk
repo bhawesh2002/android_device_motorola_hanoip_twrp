@@ -58,6 +58,11 @@ AB_OTA_POSTINSTALL_CONFIG += \
 # vendor and odm and we also dont want to AB update them
 TARGET_ENFORCE_AB_OTA_PARTITION_LIST := true
 
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_RECOVERY)/root/first_stage_ramdisk/fstab.$(PRODUCT_PLATFORM) \
+    $(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/fstab.$(PRODUCT_PLATFORM) \
+    $(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.$(PRODUCT_PLATFORM) \
+
 # Boot control HAL
 PRODUCT_PACKAGES += \
     android.hardware.boot@1.0-impl \
@@ -75,6 +80,8 @@ PRODUCT_HOST_PACKAGES += \
 # Dynamic partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 #PRODUCT_RETROFIT_DYNAMIC_PARTITIONS := true
+#BOARD_SUPER_PARTITION_METADATA_DEVICE := system
+#BOARD_SUPER_PARTITION_BLOCK_DEVICES := system vendor
 
 # qcom standard decryption
 PRODUCT_PACKAGES += \
