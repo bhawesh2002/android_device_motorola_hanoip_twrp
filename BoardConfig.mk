@@ -84,7 +84,7 @@ ADB_VENDOR_KEYS := $(PLATFORM_PATH)/ADB_VENDOR_KEYS.pub
 
 #recovery fstab
 TARGET_RECOVERY_WIPE := device/motorola/hanoip/recovery/root/system/etc/recovery.wipe
-TARGET_RECOVERY_FSTAB := device/motorola/hanoip/recovery/root/system/etc/fstab.qcom
+TARGET_RECOVERY_FSTAB := device/motorola/hanoip/fstab.qcom
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 
 # AVB
