@@ -48,45 +48,79 @@ BUILD_BROKEN_DUP_RULES := true
 
 #KERNEL
 BOARD_KERNEL_IMAGE_NAME := Image.gz
-BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 androidboot.force_normal_boot=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=1 androidboot.usbcontroller=a600000.dwc3 earlycon=msm_geni_serial,0x880000 loop.max_part=7 printk.devkmsg=on androidboot.hab.csv=5 androidboot.hab.product=hanoip androidboot.hab.cid=50 firmware_class.path=/vendor/firmware_mnt/image buildvariant=user
+BOARD_KERNEL_CMDLINE := \
+console=ttyMSM0,115200n8 \
+androidboot.force_normal_boot=1 \
+androidboot.hardware=qcom \
+androidboot.console=ttyMSM0 \
+androidboot.memcg=1 \
+lpm_levels.sleep_disabled=1 \
+video=vfb:640x400,bpp=32,memsize=3072000 \
+msm_rtb.filter=0x237 \
+service_locator.enable=1 \
+swiotlb=1 \
+androidboot.usbcontroller=a600000.dwc3 \
+earlycon=msm_geni_serial,0x880000 loop.max_part=7 \
+printk.devkmsg=on \
+androidboot.hab.csv=5 \
+androidboot.hab.product=hanoip \
+androidboot.hab.cid=50 \
+firmware_class.path=/vendor/firmware_mnt/image buildvariant=user
 
-BOARD_KERNEL_CMDLINE += androidboot.force_normal_boot=1
 BOARD_BOOTCONFIG += androidboot.boot_devices=soc/1d84000.ufshc
 
-BOARD_KERNEL_BASE        := 0x00000000
+BOARD_BOOT_HEADER_VERSION := 3
 BOARD_KERNEL_PAGESIZE    := 4096
+BOARD_FLASH_BLOCK_SIZE := 262144
+
+BOARD_KERNEL_BASE        := 0x00000000
+BOARD_KERNEL_TAGS_OFFSET   := 0x00000100
+BOARD_KERNEL_OFFSET        := 0x00008000
+BOARD_RAMDISK_OFFSET       := 0x01000000
+
+BOARD_MKBOOTIMG_ARGS += --base $(BOARD_KERNEL_BASE)
+BOARD_MKBOOTIMG_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
+BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
+BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
+BOARD_MKBOOTIMG_ARGS += --kernel_offset $(BOARD_KERNEL_OFFSET)
+BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
 
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 
-BOARD_BOOT_HEADER_VERSION := 3
-BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
-
-TARGET_NO_KERNEL := false
 TARGET_NO_RECOVERY := true
 BOARD_USES_RECOVERY_AS_BOOT := true
+TARGET_NO_KERNEL := false
+TARGET_KERNEL_VERSION := 4.14.190
+TARGET_KERNEL_ARCH := arm64
+TARGET_KERNEL_HEADER_ARCH := arm64
 
 #using prebuilts
 TARGET_PREBUILT_KERNEL := $(PLATFORM_PATH)/prebuilt/$(BOARD_KERNEL_IMAGE_NAME)
 BOARD_PREBUILT_DTBIMAGE_DIR := $(DEVICE_PATH)/prebuilt/
+BOARD_PREBUILT_DTBOIMAGE := $(PLATFORM_PATH)/prebuilt/dtbo.img
 
 #add if building kernel from source
 #TARGET_KERNEL_SOURCE := kernel/motorola/hanoip
 #TARGET_KERNEL_CONFIG := vendor/hanoip_defconfig
 #TARGET_KERNEL_CLANG_COMPILE := true
 #TARGET_KERNEL_CLANG_VERSION := r383902b
+#TARGET_KERNEL_CLANG_VERSION := r433403
 
-TARGET_KERNEL_VERSION := 4.14.190
-TARGET_KERNEL_ARCH := arm64
-TARGET_KERNEL_HEADER_ARCH := arm64
 
-#adb
-ADB_VENDOR_KEYS := $(PLATFORM_PATH)/ADB_VENDOR_KEYS.pub
-
-#recovery fstab
+#recovery
 TARGET_RECOVERY_WIPE := device/motorola/hanoip/recovery/root/system/etc/recovery.wipe
-TARGET_RECOVERY_FSTAB := device/motorola/hanoip/fstab.qcom
+TARGET_RECOVERY_FSTAB := device/motorola/hanoip/recovery.fstab
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
+TARGET_RECOVERY_DEVICE_MODULES += \
+    libandroidicu \
+    libcap \
+    libion \
+    libxml2
 
+RECOVERY_LIBRARY_SOURCE_FILES += \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libcap.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libion.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libxml2.so
 # AVB
 BOARD_AVB_ENABLE := true
 BOARD_AVB_VBMETA_SYSTEM := system
@@ -105,18 +139,7 @@ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 1
 #CONFIG_CRYPTO_AES_ARM64_CE_BLK=y
 #CONFIG_CRYPTO_SHA2_ARM64_CE=y
 
-# product.img
-BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE := ext4
-
-# userdata.img
-BOARD_USES_METADATA_PARTITION := true
-TARGET_USERIMAGES_USE_F2FS := true
-BOARD_USERDATAIMAGE_PARTITION_SIZE := 115921629184
-BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
-
-# persist.img
-BOARD_PERSISTIMAGE_PARTITION_SIZE := 33554432
-BOARD_PERSISTIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
 
 # boot.img
 BOARD_BOOTIMAGE_PARTITION_SIZE := 67108864
@@ -124,17 +147,28 @@ BOARD_BOOTIMAGE_PARTITION_SIZE := 67108864
 # vendor_boot.img
 BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
+TARGET_COPY_OUT_VENDOR := vendor
+# system_ext.img
+BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE := ext4
+TARGET_COPY_OUT_SYSTEM_EXT := system_ext
+
+# product.img
+BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_USES_PRODUCTIMAGE := true
+TARGET_COPY_OUT_PRODUCT := product
+
+# userdata.img
+TARGET_USERIMAGES_USE_F2FS := true
+TARGET_USERIMAGES_USE_EXT4 := true
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 115921629184
+BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
+
+# persist.img
+BOARD_PERSISTIMAGE_PARTITION_SIZE := 33554432
+BOARD_PERSISTIMAGE_FILE_SYSTEM_TYPE := ext4
 
 # Allow LZ4 compression
 BOARD_RAMDISK_USE_LZ4 := true
-
-# system_ext.img
-BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE := ext4
-
-#BOARD_FLASH_BLOCK_SIZE := 131072
-
-BOARD_ROOT_EXTRA_SYMLINKS := /vendor/lib/dsp:/dsp
-BOARD_ROOT_EXTRA_SYMLINKS += /mnt/vendor/persist:/persist
 
 TARGET_USES_MKE2FS := true
 
@@ -145,7 +179,8 @@ BOARD_MOTOROLA_DYNAMIC_PARTITIONS_PARTITION_LIST := \
     system \
     vendor \
     product \
-    system_ext
+    system_ext \
+    odm
 
 #BOARD_MOTOROLA_DYNAMIC_PARTITIONS_SIZE is set to BOARD_SUPER_PARTITION_SIZE / 2 - 4MB
 #BOARD_MOTOROLA_DYNAMIC_PARTITIONS_SIZE := 5398069248
@@ -165,16 +200,15 @@ PLATFORM_VERSION := 16.1.0
 PLATFORM_SECURITY_PATCH := 2021-09-01
 VENDOR_SECURITY_PATCH := 2021-09-01
 
-#CRYPTO
-TW_INCLUDE_CRYPTO := true
-TW_INCLUDE_CRYPTO_FBE := true
-TW_INCLUDE_FBE_METADATA_DECRYPT := true
+#decryption
+BOARD_USES_METADATA_PARTITION := true
 BOARD_USES_QCOM_FBE_DECRYPTION := true
 BOARD_USES_QCOM_DECRYPTION := true
 TARGET_USES_HARDWARE_QCOM_BOOTCTRL := true
 
 # Extras
 TARGET_SYSTEM_PROP += $(PLATFORM_PATH)/system.prop
+TARGET_VENDOR_PROP += $(PLATFORM_PATH)/vendor.prop
 
 BOARD_SUPPRESS_SECURE_ERASE := true
 TW_EXCLUDE_TWRPAPP := true
@@ -189,17 +223,25 @@ TWRP_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true
 
 # TWRP specific build flags
-TW_HAS_NO_RECOVERY_PARTITION := true
+#TW_HAS_NO_RECOVERY_PARTITION := true
+TW_LOAD_VENDOR_MODULES := "aw8697.ko focaltech_fts_zf.ko"
 TW_THEME := portrait_hdpi
 RECOVERY_SDCARD_ON_DATA := true
 TARGET_RECOVERY_QCOM_RTC_FIX := true
+TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.0/lun.%d/file
+TW_CUSTOM_CPU_TEMP_PATH := "/sys/devices/virtual/thermal/thermal_zone50/temp"
 TW_EXCLUDE_DEFAULT_USB_INIT := true
 TW_EXTRA_LANGUAGES := true
 TW_INCLUDE_NTFS_3G := true
+TW_INCLUDE_REPACKTOOLS := true
 TW_USE_TOOLBOX := true
+TW_INCLUDE_CRYPTO := true
+TW_INCLUDE_CRYPTO_FBE := true
+TW_INCLUDE_FBE_METADATA_DECRYPT := true
 TW_EXCLUDE_MTP := true
 TW_OEM_BUILD := true
 TW_INCLUDE_RESETPROP := true
+TW_OVERRIDE_SYSTEM_PROPS := \ "ro.build.product;ro.build.fingerprint=ro.system.build.fingerprint;ro.build.version.incremental;ro.product.device=ro.product.system.device;ro.product.model=ro.product.system.model;ro.product.name=ro.product.system.name"
 TW_INPUT_BLACKLIST := "hbtp_vm"
 TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
 TW_DEFAULT_BRIGHTNESS := 1200
