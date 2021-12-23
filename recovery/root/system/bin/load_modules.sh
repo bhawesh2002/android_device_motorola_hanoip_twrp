@@ -1,59 +1,86 @@
-#!/system/bin/sh
+#!/sbin/sh
 
-module_path=/vendor/lib/modules
+# The below variables shouldn't need to be changed
+# unless you want to call the script something else
+SCRIPTNAME="load_modules"
+LOGFILE=/tmp/recovery.log
 
-touch_class_path=/sys/class/touchscreen
-touch_path=
-firmware_path=/vendor/firmware
-firmware_file=
-device=$(getprop ro.boot.device)
+# Set default log level
+DEFAULT_LOGLEVEL=1
+# 0 Errors only
+# 1 Errors and Information
+# 2 Errors, Information, and Debugging
+CUSTOM_LOGLEVEL=$(getprop $SCRIPTNAME.loglevel)
+if [ -n "$CUSTOM_LOGLEVEL" ]; then
+    __VERBOSE="$CUSTOM_LOGLEVEL"
+else
+    __VERBOSE="$DEFAULT_LOGLEVEL"
+fi
 
-wait_for_poweron()
+# Exit codes:
+# 0 Success
+# 1 Unknown encryption type
+# 2 Temp Mount Failure
+
+# Function for logging to the recovery log
+log_print()
 {
-	local wait_nomore
-	local readiness
-	local count
-	wait_nomore=60
-	count=0
-	while true; do
-		readiness=$(cat $touch_path/poweron)
-		if [ "$readiness" == "1" ]; then
-			break;
-		fi
-		count=$((count+1))
-		[ $count -eq $wait_nomore ] && break
-		sleep 1
-	done
-	if [ $count -eq $wait_nomore ]; then
-		return 1
+	# 0 = Error; 1 = Information; 2 = Debugging
+	case $1 in
+		0|error)
+			LOG_LEVEL="E"
+			;;
+		1|info)
+			LOG_LEVEL="I"
+			;;
+		2|debug)
+			LOG_LEVEL="DEBUG"
+			;;
+		*)
+			LOG_LEVEL="UNKNOWN"
+			;;
+	esac
+	if [ $__VERBOSE -ge "$1" ]; then
+		echo "$LOG_LEVEL:$SCRIPTNAME::$2" >> "$LOGFILE"
 	fi
-	return 0
 }
 
-# Load all needed modules
-insmod $module_path/sensors_class.ko
-insmod $module_path/fpc1020_mmi.ko
-insmod $module_path/utags.ko
-insmod $module_path/exfat.ko
-insmod $module_path/mmi_annotate.ko
-insmod $module_path/mmi_info.ko
-insmod $module_path/mmi_sys_temp.ko
-insmod $module_path/moto_f_usbnet.ko
-insmod $module_path/snd_smartpa_aw882xx.ko
-insmod $module_path/ilitek_v3_mmi.ko
+finish()
+{
+	log_print 1 "$SCRIPTNAME complete."
+	exit 0
+}
 
-cd $firmware_path
-touch_product_string=$(ls $touch_class_path)
-insmod $module_path/aw8646.ko
-firmware_file="FW_ILITEK_TDDI_TM.bin"
+load_module()
+{
+	is_module_loaded=$(lsmod | grep "$1")
+	if [ -n "$is_module_loaded" ]; then
+		log_print 1 "$1 module already loaded. Proceeding..."
+	else
+		insmod "/v/lib/modules/$1.ko"
+		is_module_loaded=$(lsmod | grep "$1")
+		if [ -n "$is_module_loaded" ]; then
+			log_print 1 "Loaded $1 module."
+		else
+			log_print 1 "Unable to load $1 module."
+		fi
+	fi
+}
 
+log_print 1 "Running $SCRIPTNAME script for TWRP..."
 
-touch_path=/sys$(cat $touch_class_path/$touch_product_string/path | awk -Fliber '{print $1}')
-wait_for_poweron
-echo $firmware_file > $touch_path/doreflash
-echo 1 > $touch_path/forcereflash
-sleep 5
-echo 1 > $touch_path/reset
+load_module "aw8646"
+load_module "ilitek_v3_mmi"
+load_module "exfat"
+load_module "fpc1020_mmi"
+load_module "mmi_annotate"
+load_module "mmi_info"
+load_module "mmi_sys_temp"
+load_module "moto_f_usbnet"
+load_module "sensors_class"
+load_module "snd_smartpa_aw882xx"
+load_module "utags"
+load_module "texfat"
+load_module "tntfs"
 
-return 0
-
+finish
