@@ -98,6 +98,9 @@ PRODUCT_COPY_FILES += \
 # tell update_engine to not change dynamic partition table during updates
 # needed since our qti_dynamic_partitions does not include
 # vendor and odm and we also dont want to AB update them
+# Overlays
+DEVICE_PACKAGE_OVERLAYS += \
+    $(LOCAL_PATH)/overlay-lineage-fastbootd
 
 # Boot control HAL
 PRODUCT_PACKAGES += \
@@ -107,8 +110,8 @@ PRODUCT_PACKAGES += \
     android.hardware.boot@1.0-impl-wrapper.recovery \
     android.hardware.boot@1.0-impl-wrapper \
     android.hardware.boot@1.0-impl.recovery \
-    bootctrl.$(PRODUCT_PLATFORM) \
-    bootctrl.$(PRODUCT_PLATFORM).recovery
+    bootctrl.qcom \
+    bootctrl.qcom.recovery
 
 # Apex libraries
 PRODUCT_HOST_PACKAGES += \
@@ -133,6 +136,11 @@ PRODUCT_PACKAGES += \
 PRODUCT_SYSTEM_PROPERTY_BLACKLIST += \
     ro.bootimage.build.date.utc \
     ro.build.date.utc
+#Crypto ovverrides    
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.crypto.dm_default_key.options_format.version=2 \
+    ro.crypto.volume.metadata.method=dm-default-key \
+    ro.crypto.volume.options=::v2
 
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.vendor.build.security_patch=2021-09-01
