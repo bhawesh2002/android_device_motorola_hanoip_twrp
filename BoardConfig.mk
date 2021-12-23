@@ -48,24 +48,25 @@ BUILD_BROKEN_DUP_RULES := true
 
 #KERNEL
 BOARD_KERNEL_IMAGE_NAME := Image.gz
-BOARD_KERNEL_CMDLINE := \
-console=ttyMSM0,115200n8 \
-androidboot.force_normal_boot=1 \
-androidboot.hardware=qcom \
-androidboot.console=ttyMSM0 \
-androidboot.memcg=1 \
-lpm_levels.sleep_disabled=1 \
-video=vfb:640x400,bpp=32,memsize=3072000 \
-msm_rtb.filter=0x237 \
-service_locator.enable=1 \
-swiotlb=1 \
-androidboot.usbcontroller=a600000.dwc3 \
-earlycon=msm_geni_serial,0x880000 loop.max_part=7 \
-printk.devkmsg=on \
-androidboot.hab.csv=5 \
-androidboot.hab.product=hanoip \
-androidboot.hab.cid=50 \
-firmware_class.path=/vendor/firmware_mnt/image buildvariant=user
+BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom androidboot.console=ttyMSM0 androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 androidboot.usbcontroller=a600000.dwc3 swiotlb=2048 loop.max_part=7 cgroup.memory=nokmem,nosocket reboot=panic_warm
+#BOARD_KERNEL_CMDLINE := \
+#console=ttyMSM0,115200n8 \
+#androidboot.force_normal_boot=1 \
+#androidboot.hardware=qcom \
+#androidboot.console=ttyMSM0 \
+#androidboot.memcg=1 \
+#lpm_levels.sleep_disabled=1 \
+#video=vfb:640x400,bpp=32,memsize=3072000 \
+#msm_rtb.filter=0x237 \
+#service_locator.enable=1 \
+#swiotlb=1 \
+#androidboot.usbcontroller=a600000.dwc3 \
+#earlycon=msm_geni_serial,0x880000 loop.max_part=7 \
+#printk.devkmsg=on \
+#androidboot.hab.csv=5 \
+#androidboot.hab.product=hanoip \
+#androidboot.hab.cid=50 \
+#firmware_class.path=/vendor/firmware_mnt/image buildvariant=user
 
 BOARD_BOOTCONFIG += androidboot.boot_devices=soc/1d84000.ufshc
 
@@ -77,6 +78,7 @@ BOARD_KERNEL_BASE        := 0x00000000
 BOARD_KERNEL_TAGS_OFFSET   := 0x00000100
 BOARD_KERNEL_OFFSET        := 0x00008000
 BOARD_RAMDISK_OFFSET       := 0x01000000
+BOARD_KERNEL_SEPARATED_DTBO := true
 
 BOARD_MKBOOTIMG_ARGS += --base $(BOARD_KERNEL_BASE)
 BOARD_MKBOOTIMG_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
@@ -99,10 +101,13 @@ TARGET_PREBUILT_KERNEL := $(PLATFORM_PATH)/prebuilt/$(BOARD_KERNEL_IMAGE_NAME)
 BOARD_PREBUILT_DTBIMAGE_DIR := $(DEVICE_PATH)/prebuilt/
 BOARD_PREBUILT_DTBOIMAGE := $(PLATFORM_PATH)/prebuilt/dtbo.img
 
+BOARD_DTBOIMG_PARTITION_SIZE := 25165824
+
+#Clang
+TARGET_KERNEL_CLANG_COMPILE := true
 #add if building kernel from source
 #TARGET_KERNEL_SOURCE := kernel/motorola/hanoip
 #TARGET_KERNEL_CONFIG := vendor/hanoip_defconfig
-#TARGET_KERNEL_CLANG_COMPILE := true
 #TARGET_KERNEL_CLANG_VERSION := r383902b
 #TARGET_KERNEL_CLANG_VERSION := r433403
 
@@ -123,6 +128,8 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/libxml2.so
 # AVB
 BOARD_AVB_ENABLE := true
+BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --set_hashtree_disabled_flag
+BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 2
 BOARD_AVB_VBMETA_SYSTEM := system
 BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
 BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
@@ -173,23 +180,22 @@ BOARD_RAMDISK_USE_LZ4 := true
 TARGET_USES_MKE2FS := true
 
 # dynamic partition
-BOARD_SUPER_PARTITION_SIZE := 10804527104
+BOARD_SUPER_PARTITION_SIZE := 9729736704
 BOARD_SUPER_PARTITION_GROUPS := motorola_dynamic_partitions
 BOARD_MOTOROLA_DYNAMIC_PARTITIONS_PARTITION_LIST := \
     system \
     vendor \
     product \
     system_ext \
-    odm
+    odm 
 
 #BOARD_MOTOROLA_DYNAMIC_PARTITIONS_SIZE is set to BOARD_SUPER_PARTITION_SIZE / 2 - 4MB
 #BOARD_MOTOROLA_DYNAMIC_PARTITIONS_SIZE := 5398069248
 
-#BOARD_MOTOROLA_DYNAMIC_PARTITIONS_SIZE is set to BOARD_SUPER_PARTITION_SIZE - 4MB
-BOARD_MOTOROLA_DYNAMIC_PARTITIONS_SIZE := 10800332800
+BOARD_MOTOROLA_DYNAMIC_PARTITIONS_SIZE := 4864868352
 
 # Set error limit to BOARD_SUPER_PARTITON_SIZE - 500MB
-BOARD_SUPER_PARTITION_ERROR_LIMIT := 10280239104
+#BOARD_SUPER_PARTITION_ERROR_LIMIT := 10280239104
 
 BOARD_HAS_LARGE_FILESYSTEM := true
 
@@ -214,6 +220,9 @@ BOARD_SUPPRESS_SECURE_ERASE := true
 TW_EXCLUDE_TWRPAPP := true
 TW_HAS_EDL_MODE := true
 
+# GPT Utils
+BOARD_PROVIDES_GPTUTILS := true
+
 # Asian region languages
 TW_EXTRA_LANGUAGES := true
 # TW_DEFAULT_LANGUAGE := zh_CN
@@ -224,13 +233,12 @@ TARGET_USES_LOGD := true
 
 # TWRP specific build flags
 #TW_HAS_NO_RECOVERY_PARTITION := true
-TW_LOAD_VENDOR_MODULES := "aw8697.ko focaltech_fts_zf.ko"
+TW_LOAD_VENDOR_MODULES := "aw8697.ko ilitek_v3_mmi.ko"
 TW_THEME := portrait_hdpi
 RECOVERY_SDCARD_ON_DATA := true
 TARGET_RECOVERY_QCOM_RTC_FIX := true
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.0/lun.%d/file
 TW_CUSTOM_CPU_TEMP_PATH := "/sys/devices/virtual/thermal/thermal_zone50/temp"
-TW_EXCLUDE_DEFAULT_USB_INIT := true
 TW_EXTRA_LANGUAGES := true
 TW_INCLUDE_NTFS_3G := true
 TW_INCLUDE_REPACKTOOLS := true
