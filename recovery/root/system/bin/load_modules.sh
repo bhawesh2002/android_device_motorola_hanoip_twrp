@@ -71,16 +71,5 @@ log_print 1 "Running $SCRIPTNAME script for TWRP..."
 
 load_module "aw8646"
 load_module "ilitek_v3_mmi"
-load_module "exfat"
-load_module "fpc1020_mmi"
-load_module "mmi_annotate"
-load_module "mmi_info"
-load_module "mmi_sys_temp"
-load_module "moto_f_usbnet"
-load_module "sensors_class"
-load_module "snd_smartpa_aw882xx"
-load_module "utags"
-load_module "texfat"
-load_module "tntfs"
 
 finish
