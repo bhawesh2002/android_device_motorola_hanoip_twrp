@@ -24,7 +24,7 @@ $(call inherit-product, vendor/twrp/config/common.mk)
 PRODUCT_DEVICE := hanoip
 PRODUCT_NAME := twrp_$(PRODUCT_DEVICE)
 PRODUCT_BRAND := motorola
-PRODUCT_MODEL := motorola moto g(40) fusion
+PRODUCT_MODEL := motorola hanoip
 PRODUCT_MANUFACTURER := motorola
 
 # Inherit from hardware-specific part of the product configuration
