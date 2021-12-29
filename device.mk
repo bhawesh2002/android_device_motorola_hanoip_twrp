@@ -1,5 +1,5 @@
 #
-# Copyright 2021 The Android Open Source Project
+# Copyright 2020 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,47 +18,47 @@
 # Inherit from the common Open Source product configuration
 $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
 
-# Enable project quotas and casefolding for emulated storage without sdcardfs
-$(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
-
-# Installs gsi keys into ramdisk, to boot a GSI with verified boot.
-$(call inherit-product, $(SRC_TARGET_DIR)/product/gsi_keys.mk)
-
+# define hardware platform
+PRODUCT_PLATFORM := sm7150
 PLATFORM_PATH := device/motorola/hanoip
 
-PRODUCT_SHIPPING_API_LEVEL := 30
-
-PRODUCT_TARGET_VNDK_VERSION := 30
-
-# define hardware platform
-PRODUCT_PLATFORM := sm6150
-
-#A/B
-TARGET_ENFORCE_AB_OTA_PARTITION_LIST := true
-
+# A/B support
 AB_OTA_UPDATER := true
 
-ENABLE_VIRTUAL_AB := true
-$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
-
+# A/B updater updatable partitions list. Keep in sync with the partition list
+# with "_a" and "_b" variants in the device. Note that the vendor can add more
+# more partitions to this list for the bootloader and radio.
 AB_OTA_PARTITIONS += \
     boot \
-    vendor_boot \
-    odm \
-    vendor \
-    system \
-    vbmeta \
     dtbo \
     product \
+    system \
+    system_ext \
+    vendor \
+    vbmeta \
     vbmeta_system \
-    system_ext
-    
+    vendor_boot 
+
+
+PRODUCT_COPY_FILES += \
+	$(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/fstab.qcom
+
+PRODUCT_COPY_FILES += device/motorola/hanoip/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom
+
+	
+PRODUCT_COPY_FILES += \
+    $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/1.1/aw8646.ko:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1/aw8646.ko \
+    $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/1.1/ilitek_v3_mmi.ko:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1/ilitek_v3_mmi.ko \
+
 PRODUCT_PACKAGES += \
     otapreopt_script \
     cppreopts.sh \
     update_engine \
-    update_engine_sideload \
     update_verifier
+
+PRODUCT_PACKAGES += \
+    bootctrl.$(PRODUCT_PLATFORM) \
+    update_engine_sideload
 
 AB_OTA_POSTINSTALL_CONFIG += \
     RUN_POSTINSTALL_system=true \
@@ -66,67 +66,36 @@ AB_OTA_POSTINSTALL_CONFIG += \
     FILESYSTEM_TYPE_system=ext4 \
     POSTINSTALL_OPTIONAL_system=true
 
-# Dynamic partitions
-PRODUCT_USE_DYNAMIC_PARTITIONS := true
-
-# fastbootd
-PRODUCT_PACKAGES += \
-    android.hardware.fastboot@1.0-impl-mock \
-    fastbootd
-
-# qcom decryption
-PRODUCT_PACKAGES += \
-    qcom_decrypt \
-    qcom_decrypt_fbe \
-
-PRODUCT_COPY_FILES += \
-    $(PLATFORM_PATH)/recovery.fstab:$(TARGET_COPY_OUT_RECOVERY)/root/first_stage_ramdisk/recovery.fstab \
-    $(PLATFORM_PATH)/recovery.fstab:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/recovery.fstab \
-    $(PLATFORM_PATH)/recovery.fstab:$(TARGET_COPY_OUT_VENDOR)/etc/recovery.fstab \
-    
-# Use /product/etc/fstab.postinstall to mount system_other
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.postinstall.fstab.prefix=/product
-
-PRODUCT_COPY_FILES += \
-    $(PLATFORM_PATH)/recovery/root/system/etc/fstab.postinstall:$(TARGET_COPY_OUT_PRODUCT)/etc/fstab.postinstall
-    
-PRODUCT_COPY_FILES += \
-    $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/1.1/aw8646.ko:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1/aw8646.ko \
-    $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/1.1/ilitek_v3_mmi.ko:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1/ilitek_v3_mmi.ko \
-
 # tell update_engine to not change dynamic partition table during updates
 # needed since our qti_dynamic_partitions does not include
 # vendor and odm and we also dont want to AB update them
-# Overlays
-DEVICE_PACKAGE_OVERLAYS += \
-    $(LOCAL_PATH)/overlay-lineage-fastbootd
+TARGET_ENFORCE_AB_OTA_PARTITIPLATFORM_PATHON_LIST := true
 
 # Boot control HAL
 PRODUCT_PACKAGES += \
     android.hardware.boot@1.0-impl \
     android.hardware.boot@1.0-service \
-    android.hardware.boot@1.1-impl-qti.recovery \
     android.hardware.boot@1.0-impl-wrapper.recovery \
     android.hardware.boot@1.0-impl-wrapper \
     android.hardware.boot@1.0-impl.recovery \
-    bootctrl.qcom \
-    bootctrl.qcom.recovery
+    bootctrl.$(PRODUCT_PLATFORM) \
+    bootctrl.$(PRODUCT_PLATFORM).recovery
 
 # Apex libraries
 PRODUCT_HOST_PACKAGES += \
     libandroidicu
 
-PRODUCT_COPY_FILES += \
-    $(OUT_DIR)/target/product/hanoip/obj/SHARED_LIBRARIES/libandroidicu_intermediates/libandroidicu.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/libandroidicu.so
+# Dynamic partitions
+PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
-# OEM otacert
-PRODUCT_EXTRA_RECOVERY_KEYS += \
-    $(PLATFORM_PATH)/security/ota \
+# qcom standard decryption
+PRODUCT_PACKAGES += \
+    qcom_decrypt \
+    qcom_decrypt_fbe
 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
-    $(PLATFORM_PATH)
+    $(LOCAL_PATH)
 
 # tzdata
 PRODUCT_PACKAGES += \
@@ -136,11 +105,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_SYSTEM_PROPERTY_BLACKLIST += \
     ro.bootimage.build.date.utc \
     ro.build.date.utc
-#Crypto ovverrides    
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.crypto.dm_default_key.options_format.version=2 \
-    ro.crypto.volume.metadata.method=dm-default-key \
-    ro.crypto.volume.options=::v2
 
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.vendor.build.security_patch=2021-09-01
