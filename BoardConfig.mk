@@ -43,13 +43,13 @@ TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
 TARGET_CPU_ABI := arm64-v8a
 TARGET_CPU_ABI2 :=
-TARGET_CPU_VARIANT := cortex-a73
+TARGET_CPU_VARIANT := generic
 
 TARGET_2ND_ARCH := arm
 TARGET_2ND_ARCH_VARIANT := armv8-a
 TARGET_2ND_CPU_ABI := armeabi-v7a
 TARGET_2ND_CPU_ABI2 := armeabi
-TARGET_2ND_CPU_VARIANT := cortex-a73
+TARGET_2ND_CPU_VARIANT := cortex-a9
 
 
 # GPT Utils
@@ -58,41 +58,42 @@ BOARD_PROVIDES_GPTUTILS := true
 # Kernel
 BOARD_KERNEL_IMAGE_NAME := Image.gz
 
-BOARD_KERNEL_CMDLINE := \
-console=ttyMSM0,115200n8 \
-androidboot.console=ttyMSM0 \
-androidboot.hardware=qcom \
-androidboot.baseband=msm \
-video=vfb:640x400,bpp=32,memsize=3072000 \
-androidboot.usbcontroller=a600000.dwc3 \
-androidboot.memcg=1 \
-msm_rtb.filter=0x237 \
-service_locator.enable=1 \
-swiotlb=1 \
-loop.max_part=7 \
-printk.devkmsg=on \
-androidboot.hab.csv=5 \
-androidboot.hab.product=hanoip \
-firmware_class.path=/vendor/firmware_mnt/image \
-androidboot.verifiedbootstate=orange \
-androidboot.keymaster=1 \
-androidboot.vbmeta.device=PARTUUID=53fd77d8-b172-9209-9061-9355a75e8b9b \
-androidboot.vbmeta.avb_version=1.0 \
-androidboot.vbmeta.device_state=unlocked \
-androidboot.vbmeta.hash_alg=sha256 \
-androidboot.vbmeta.size=6464 \
-androidboot.vbmeta.digest=94c13e24836a893accfd1a9883b9fe896cad58ad61387c0074250adb75a0a85a \
-androidboot.veritymode=enforcing \
-androidboot.bootdevice=1d84000.ufshc \
-androidboot.fstab_suffix=default \
-androidboot.boot_devices=soc/1d84000.ufshc \
-androidboot.device=hanoip \
-androidboot.mode=normal \
-androidboot.baseband=msm \
-msm_drm.dsi_display0=dsi_ili7807s_tm_678_vid_display: \
-androidboot.dtbo_idx=0 \
-androidboot.dtb_idx=0 \
-androidboot.force_normal_boot=1
+BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 androidboot.hardware=qcom androidboot.console=ttyMSM0 androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=1 androidboot.usbcontroller=a600000.dwc3 earlycon=msm_geni_serial,0x880000 loop.max_part=7 printk.devkmsg=on androidboot.hab.csv=5 androidboot.hab.product=hanoip androidboot.hab.cid=50 firmware_class.path=/vendor/firmware_mnt/image buildvariant=user
+#BOARD_KERNEL_CMDLINE := \
+#console=ttyMSM0,115200n8 \
+#androidboot.console=ttyMSM0 \
+#androidboot.hardware=qcom \
+#androidboot.baseband=msm \
+#video=vfb:640x400,bpp=32,memsize=3072000 \
+#androidboot.usbcontroller=a600000.dwc3 \
+#androidboot.memcg=1 \
+#msm_rtb.filter=0x237 \
+#service_locator.enable=1 \
+#swiotlb=1 \
+#loop.max_part=7 \
+#printk.devkmsg=on \
+#androidboot.hab.csv=5 \
+#androidboot.hab.product=hanoip \
+#firmware_class.path=/vendor/firmware_mnt/image \
+#androidboot.verifiedbootstate=orange \
+#androidboot.keymaster=1 \
+#androidboot.vbmeta.device=PARTUUID=53fd77d8-b172-9209-9061-9355a75e8b9b \
+#androidboot.vbmeta.avb_version=1.0 \
+#androidboot.vbmeta.device_state=unlocked \
+#androidboot.vbmeta.hash_alg=sha256 \
+#androidboot.vbmeta.size=6464 \
+#androidboot.vbmeta.digest=94c13e24836a893accfd1a9883b9fe896cad58ad61387c0074250adb75a0a85a \
+#androidboot.veritymode=enforcing \
+#androidboot.bootdevice=1d84000.ufshc \
+#androidboot.fstab_suffix=default \
+#androidboot.boot_devices=soc/1d84000.ufshc \
+#androidboot.device=hanoip \
+#androidboot.mode=normal \
+#androidboot.baseband=msm \
+#msm_drm.dsi_display0=dsi_ili7807s_tm_678_vid_display: \
+#androidboot.dtbo_idx=0 \
+#androidboot.dtb_idx=0 \
+#androidboot.force_normal_boot=1
 
 BOARD_KERNEL_CMDLINE += androidboot.fastboot=1
 BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
@@ -106,13 +107,19 @@ BOARD_KERNEL_OFFSET        := 0x00008000
 BOARD_RAMDISK_OFFSET       := 0x01000000
 BOARD_DTB_OFFSET           := 0x01f00000
 
+#kernel source
+#TARGET_KERNEL_SOURCE := kernel/motorola/hanoip
+#TARGET_KERNEL_CONFIG := vendor/hanoip_defconfig
+
 # prebuilts
-#BOARD_PREBUILT_DTBIMAGE_DIR := $(PLATFORM_PATH)/prebuilt/dtb
 BOARD_PREBUILT_DTBIMAGE_DIR := $(PLATFORM_PATH)/prebuilt/
 TARGET_PREBUILT_KERNEL := $(PLATFORM_PATH)/prebuilt/Image.gz
 BOARD_PREBUILT_DTBOIMAGE := $(PLATFORM_PATH)/prebuilt/dtbo.img
 
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
+
+TARGET_KERNEL_ADDITIONAL_FLAGS := \
+    DTC=$(shell pwd)/$(PLATFORM_PATH)/dtc/dtc
 
 #mkbootimg arguments
 BOARD_MKBOOTIMG_ARGS += --base $(BOARD_KERNEL_BASE)
@@ -178,9 +185,6 @@ BOARD_MOTOROLA_DYNAMIC_PARTITIONS_PARTITION_LIST := \
     vendor \
     system_ext 
 
-#BOARD_MOTOROLA_DYNAMIC_PARTITIONS_SIZE is set to BOARD_SUPER_PARTITION_SIZE / 2 - 4MB
-#BOARD_MOTOROLA_DYNAMIC_PARTITIONS_SIZE := 5398069248
-
 # Recovery
 BOARD_HAS_NO_SELECT_BUTTON := true
 BOARD_HAS_LARGE_FILESYSTEM := true
@@ -200,6 +204,8 @@ BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
 
 # AVB
 BOARD_AVB_ENABLE := true
+BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --set_hashtree_disabled_flag
+BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 2
 BOARD_AVB_VBMETA_SYSTEM := system
 BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
 BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
@@ -258,8 +264,8 @@ TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
 
 # Encryption
 PLATFORM_VERSION := 16.1.0
-PLATFORM_SECURITY_PATCH := 2021-09-01
-VENDOR_SECURITY_PATCH := 2021-09-01
+PLATFORM_SECURITY_PATCH := 2099-12-31
+VENDOR_SECURITY_PATCH := 2099-12-31
 TW_INCLUDE_CRYPTO := true
 BOARD_USES_QCOM_FBE_DECRYPTION := true
 BOARD_USES_METADATA_PARTITION := true
@@ -277,8 +283,8 @@ TW_EXTRA_LANGUAGES := true
 # TW_DEFAULT_LANGUAGE := zh_CN
 
 # Notch Offset
-TW_Y_OFFSET := 89
-TW_H_OFFSET := -89
+TW_Y_OFFSET := 120
+TW_H_OFFSET := -120
 
 # Debug flags
 TWRP_INCLUDE_LOGCAT := true
