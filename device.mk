@@ -43,8 +43,10 @@ AB_OTA_PARTITIONS += \
 PRODUCT_COPY_FILES += \
 	$(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/fstab.qcom
 
-PRODUCT_COPY_FILES += device/motorola/hanoip/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom
-
+PRODUCT_COPY_FILES += \
+	$(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom
+PRODUCT_COPY_FILES += \
+    	$(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_RAMDISK)/fstab.qcom
 	
 PRODUCT_COPY_FILES += \
     $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/1.1/aw8646.ko:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1/aw8646.ko \
@@ -81,6 +83,18 @@ PRODUCT_PACKAGES += \
     bootctrl.$(PRODUCT_PLATFORM) \
     bootctrl.$(PRODUCT_PLATFORM).recovery
 
+PRODUCT_PACKAGES_DEBUG += \
+    bootctl
+
+PRODUCT_PACKAGES += \
+    fstab.qcom \
+
+PRODUCT_PACKAGES += \
+    vendor.qti.hardware.cryptfshw@1.0.vendor
+
+PRODUCT_PACKAGES += \
+    fs_config_files
+
 # Apex libraries
 PRODUCT_HOST_PACKAGES += \
     libandroidicu
@@ -106,5 +120,10 @@ PRODUCT_SYSTEM_PROPERTY_BLACKLIST += \
     ro.bootimage.build.date.utc \
     ro.build.date.utc
 
+# Apex libraries
+PRODUCT_COPY_FILES += \
+    $(OUT_DIR)/target/product/$(PRODUCT_RELEASE_NAME)/obj/SHARED_LIBRARIES/libandroidicu_intermediates/libandroidicu.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/libandroidicu.so
+
+
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.vendor.build.security_patch=2021-09-01
+    ro.vendor.build.security_patch=2021-09-01   
