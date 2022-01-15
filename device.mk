@@ -19,7 +19,7 @@
 $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
 
 # define hardware platform
-PRODUCT_PLATFORM := sm7150
+PRODUCT_PLATFORM := sm6150
 PLATFORM_PATH := device/motorola/hanoip
 
 # A/B support
