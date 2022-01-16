@@ -202,7 +202,7 @@ TARGET_NO_RECOVERY := true
 BOARD_USES_RECOVERY_AS_BOOT := true
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
 
-vendor_lkm_dir := $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/1.1
+vendor_lkm_dir := $(PLATFORM_PATH)/recovery/root/vendor/lib/modules
 BOARD_RECOVERY_KERNEL_MODULES := \
   $(vendor_lkm_dir)/aw8646.ko \
   $(vendor_lkm_dir)/exfat.ko \

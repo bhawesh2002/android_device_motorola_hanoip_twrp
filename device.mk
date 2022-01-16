@@ -51,8 +51,8 @@ PRODUCT_COPY_FILES += \
         $$(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_RECOVERY)/root/first_stage_ramdisk/fstab.qcom
 	
 PRODUCT_COPY_FILES += \
-    $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/1.1/aw8646.ko:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1/aw8646.ko \
-    $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/1.1/ilitek_v3_mmi.ko:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/1.1/ilitek_v3_mmi.ko \
+    $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/aw8646.ko:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/aw8646.ko \
+    $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/ilitek_v3_mmi.ko:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/ilitek_v3_mmi.ko \
 
 PRODUCT_PACKAGES += \
     otapreopt_script \
