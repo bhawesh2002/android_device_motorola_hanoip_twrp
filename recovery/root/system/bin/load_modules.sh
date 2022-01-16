@@ -1,75 +1,58 @@
-#!/sbin/sh
+#!/system/bin/sh
 
-# The below variables shouldn't need to be changed
-# unless you want to call the script something else
-SCRIPTNAME="load_modules"
-LOGFILE=/tmp/recovery.log
+module_path=/vendor/lib/modules
 
-# Set default log level
-DEFAULT_LOGLEVEL=1
-# 0 Errors only
-# 1 Errors and Information
-# 2 Errors, Information, and Debugging
-CUSTOM_LOGLEVEL=$(getprop $SCRIPTNAME.loglevel)
-if [ -n "$CUSTOM_LOGLEVEL" ]; then
-    __VERBOSE="$CUSTOM_LOGLEVEL"
-else
-    __VERBOSE="$DEFAULT_LOGLEVEL"
-fi
+touch_class_path=/sys/class/touchscreen
+touch_path=
+firmware_path=/vendor/firmware
+firmware_file=
+device=$(getprop ro.boot.device)
 
-# Exit codes:
-# 0 Success
-# 1 Unknown encryption type
-# 2 Temp Mount Failure
-
-# Function for logging to the recovery log
-log_print()
+wait_for_poweron()
 {
-	# 0 = Error; 1 = Information; 2 = Debugging
-	case $1 in
-		0|error)
-			LOG_LEVEL="E"
-			;;
-		1|info)
-			LOG_LEVEL="I"
-			;;
-		2|debug)
-			LOG_LEVEL="DEBUG"
-			;;
-		*)
-			LOG_LEVEL="UNKNOWN"
-			;;
-	esac
-	if [ $__VERBOSE -ge "$1" ]; then
-		echo "$LOG_LEVEL:$SCRIPTNAME::$2" >> "$LOGFILE"
-	fi
-}
-
-finish()
-{
-	log_print 1 "$SCRIPTNAME complete."
-	exit 0
-}
-
-load_module()
-{
-	is_module_loaded=$(lsmod | grep "$1")
-	if [ -n "$is_module_loaded" ]; then
-		log_print 1 "$1 module already loaded. Proceeding..."
-	else
-		insmod "/v/lib/modules/$1.ko"
-		is_module_loaded=$(lsmod | grep "$1")
-		if [ -n "$is_module_loaded" ]; then
-			log_print 1 "Loaded $1 module."
-		else
-			log_print 1 "Unable to load $1 module."
+	local wait_nomore
+	local readiness
+	local count
+	wait_nomore=60
+	count=0
+	while true; do
+		readiness=$(cat $touch_path/poweron)
+		if [ "$readiness" == "1" ]; then
+			break;
 		fi
+		count=$((count+1))
+		[ $count -eq $wait_nomore ] && break
+		sleep 1
+	done
+	if [ $count -eq $wait_nomore ]; then
+		return 1
 	fi
+	return 0
 }
 
-log_print 1 "Running $SCRIPTNAME script for TWRP..."
+# Load all needed modules
+insmod $module_path/sensors_class.ko
+insmod $module_path/fpc1020_mmi.ko
+insmod $module_path/ilitek_v3_mmi.ko
+insmod $module_path/utags.ko
+insmod $module_path/exfat.ko
+insmod $module_path/mmi_annotate.ko
+insmod $module_path/mmi_info.ko
+insmod $module_path/mmi_sys_temp.ko
+insmod $module_path/moto_f_usbnet.ko
+insmod $module_path/snd_smartpa_aw882xx.ko
 
-load_module "aw8646"
-load_module "ilitek_v3_mmi"
+cd $firmware_path
+insmod $module_path/aw8646.ko
+firmware_file="FW_ILITEK_TDDI_TM.bin"
 
-finish
+
+touch_path=/sys$(cat $touch_class_path/ilitek/path | awk -Fhanoip '{print $1}')
+wait_for_poweron
+echo $firmware_file > $touch_path/doreflash
+echo 1 > $touch_path/forcereflash
+sleep 5
+echo 1 > $touch_path/reset
+
+return 0
+
