@@ -202,6 +202,20 @@ TARGET_NO_RECOVERY := true
 BOARD_USES_RECOVERY_AS_BOOT := true
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
 
+vendor_lkm_dir := $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/1.1
+BOARD_RECOVERY_KERNEL_MODULES := \
+  $(vendor_lkm_dir)/aw8646.ko \
+  $(vendor_lkm_dir)/exfat.ko \
+  $(vendor_lkm_dir)/fpc1020_mmi.ko \
+  $(vendor_lkm_dir)/ilitek_v3_mmi.ko \
+  $(vendor_lkm_dir)/mmi_annotate.ko \
+  $(vendor_lkm_dir)/mmi_info.ko \
+  $(vendor_lkm_dir)/mmi_sys_temp.ko \
+  $(vendor_lkm_dir)/moto_f_usbnet.ko \
+  $(vendor_lkm_dir)/sensors_class.ko \
+  $(vendor_lkm_dir)/snd_smartpa_aw882xx.ko \
+  $(vendor_lkm_dir)/utags.ko
+
 # AVB
 BOARD_AVB_ENABLE := true
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --set_hashtree_disabled_flag
@@ -246,7 +260,6 @@ TARGET_RECOVERY_DEVICE_MODULES += \
     ashmemd_aidl_interface-cpp \
     libashmemd_client \
     libcap \
-#    libicui18n \
     libicuuc \
     libion \
     libpcrecpp \
@@ -261,7 +274,6 @@ TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/ashmemd_aidl_interface-cpp.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libashmemd_client.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libcap.so \
-#    $(TARGET_OUT_SHARED_LIBRARIES)/libicui18n.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libicuuc.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libion.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libpcrecpp.so \
