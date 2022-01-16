@@ -84,7 +84,7 @@ on property:sys.usb.config=fastboot && property:sys.usb.ffs.ready=1 && property:
 
 on fs
     wait /dev/block/platform/soc/1d84000.ufshc
-    symlink /dev/block/platform/soc/1d84000.ufshc /dev/block/bootdevice
+    symlink /dev/block/platform/soc/1d84000.ufshc /dev/block/bootdevice/by-name
     export LD_LIBRARY_PATH /sbin:/vendor/lib64:/vendor/lib64/hw
     start load_modules
     
