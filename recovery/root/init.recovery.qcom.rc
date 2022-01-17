@@ -147,6 +147,13 @@ on early-fs
     # Once metadata has been mounted, we'll need vold to deal with userdata checkpointing
     start vold
 
+on post-fs
+    exec - system system -- /system/bin/vdc checkpoint markBootAttempt
+
+    # Once everything is setup, no need to modify /.
+    # The bind+remount combination allows this to work in containers.
+    mount rootfs rootfs / remount bind ro nodev
+
 on boot
     start health-hal-2-1
 
