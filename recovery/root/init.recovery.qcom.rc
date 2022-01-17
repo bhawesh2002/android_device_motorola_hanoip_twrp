@@ -304,6 +304,11 @@ on post-fs-data
     mkdir /data/vendor_de 0771 root root encryption=None
     mkdir /data/vendor/hardware 0771 root root
 
+    # create dalvik-cache, so as to enforce our permissions
+    mkdir /data/dalvik-cache 0771 root root encryption=Require
+    # create the A/B OTA directory, so as to enforce our permissions
+    mkdir /data/ota 0771 root root encryption=Require
+
 
 on boot
     start health-hal-2-1
