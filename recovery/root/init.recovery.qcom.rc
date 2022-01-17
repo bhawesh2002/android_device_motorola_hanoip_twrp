@@ -106,6 +106,10 @@ on init
     mkdir /mnt/expand 0771 system system
     mkdir /mnt/appfuse 0711 root root
 
+on early-fs
+    # Once metadata has been mounted, we'll need vold to deal with userdata checkpointing
+    start vold
+
 on boot
     start health-hal-2-1
 
