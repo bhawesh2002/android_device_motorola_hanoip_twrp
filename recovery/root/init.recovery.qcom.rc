@@ -29,6 +29,9 @@ import /init.recovery.qcom_decrypt.rc
 
 on early-init
     start fstab_fixup
+    # Disable dm-verity hash prefetching, since it doesn't help performance
+    # Read more in b/136247322
+    write /sys/module/dm_verity/parameters/prefetch_cluster 0
     
 on init
     mkdir /config
