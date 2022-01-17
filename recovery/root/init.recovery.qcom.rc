@@ -183,6 +183,11 @@ on post-fs
 
     mkdir /metadata/staged-install 0770 root system
 
+on late-fs
+    # HALs required before storage encryption can get unlocked (FBE/FDE)
+    class_start early_hal
+
+
 on boot
     start health-hal-2-1
 
