@@ -26,6 +26,7 @@
 #
 
 import /init.recovery.qcom_decrypt.rc
+import /init.recovery.qcom_decrypt.fbe.rc
 
 on early-init
     start fstab_fixup
