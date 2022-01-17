@@ -335,6 +335,14 @@ on post-fs-data
     mkdir /data/user/0 0700 system system encryption=None
     mount none /data/data /data/user/0 bind rec
 
+     # Wait for apexd to finish activating APEXes before starting more processes.
+    wait_for_prop apexd.status activated
+    perform_apex_config
+
+    # Special-case /data/media/obb per b/64566063
+    mkdir /data/media 0770 media_rw media_rw encryption=None
+    exec - media_rw media_rw -- /system/bin/chattr +F /data/media
+
 
 on boot
     start health-hal-2-1
