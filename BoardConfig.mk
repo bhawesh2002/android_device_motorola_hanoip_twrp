@@ -202,19 +202,19 @@ TARGET_NO_RECOVERY := true
 BOARD_USES_RECOVERY_AS_BOOT := true
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
 
-vendor_lkm_dir := $(PLATFORM_PATH)/recovery/root/vendor/lib/modules
-BOARD_RECOVERY_KERNEL_MODULES := \
-  $(vendor_lkm_dir)/aw8646.ko \
-  $(vendor_lkm_dir)/exfat.ko \
-  $(vendor_lkm_dir)/fpc1020_mmi.ko \
-  $(vendor_lkm_dir)/ilitek_v3_mmi.ko \
-  $(vendor_lkm_dir)/mmi_annotate.ko \
-  $(vendor_lkm_dir)/mmi_info.ko \
-  $(vendor_lkm_dir)/mmi_sys_temp.ko \
-  $(vendor_lkm_dir)/moto_f_usbnet.ko \
-  $(vendor_lkm_dir)/sensors_class.ko \
-  $(vendor_lkm_dir)/snd_smartpa_aw882xx.ko \
-  $(vendor_lkm_dir)/utags.ko
+#vendor_lkm_dir := $(PLATFORM_PATH)/recovery/root/vendor/lib/modules
+#BOARD_RECOVERY_KERNEL_MODULES := \
+#  $(vendor_lkm_dir)/aw8646.ko \
+#  $(vendor_lkm_dir)/exfat.ko \
+#  $(vendor_lkm_dir)/fpc1020_mmi.ko \
+#  $(vendor_lkm_dir)/ilitek_v3_mmi.ko \
+#  $(vendor_lkm_dir)/mmi_annotate.ko \
+#  $(vendor_lkm_dir)/mmi_info.ko \
+#  $(vendor_lkm_dir)/mmi_sys_temp.ko \
+#  $(vendor_lkm_dir)/moto_f_usbnet.ko \
+#  $(vendor_lkm_dir)/sensors_class.ko \
+#  $(vendor_lkm_dir)/snd_smartpa_aw882xx.ko \
+#  $(vendor_lkm_dir)/utags.ko
 
 # AVB
 BOARD_AVB_ENABLE := true
@@ -239,7 +239,7 @@ BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
 
 # TWRP specific build flags
-TW_LOAD_VENDOR_MODULES := "aw8697.ko ilitek_v3_mmi.ko"
+#TW_LOAD_VENDOR_MODULES := "aw8697.ko ilitek_v3_mmi.ko"
 RECOVERY_SDCARD_ON_DATA := true
 TARGET_RECOVERY_QCOM_RTC_FIX := true
 TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
