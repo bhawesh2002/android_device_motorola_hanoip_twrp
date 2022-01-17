@@ -256,9 +256,6 @@ TW_CUSTOM_BATTERY_PATH := "/sys/class/power_supply/qcom_battery"
 TW_NO_CPU_TEMP := true
 TW_NO_SCREEN_BLANK := true
 
-TW_OVERRIDE_SYSTEM_PROPS := \
-    "ro.build.fingerprint=ro.system.build.fingerprint;ro.build.version.incremental"
-
 # Additional binaries & libraries needed for recovery
 TARGET_RECOVERY_DEVICE_MODULES += \
     android.hidl.base@1.0 \
