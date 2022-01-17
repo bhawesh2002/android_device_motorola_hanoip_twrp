@@ -30,35 +30,7 @@ import /init.recovery.qcom_decrypt.fbe.rc
 
 on early-init
     start fstab_fixup
-    # Disable dm-verity hash prefetching, since it doesn't help performance
-    # Read more in b/136247322
-    write /sys/module/dm_verity/parameters/prefetch_cluster 0
-    # Generate ld.config.txt for early executed processes
-    exec -- /system/bin/linkerconfig --target /linkerconfig/bootstrap
-    chmod 644 /linkerconfig/bootstrap/ld.config.txt
-    copy /linkerconfig/bootstrap/ld.config.txt /linkerconfig/default/ld.config.txt
-    chmod 644 /linkerconfig/default/ld.config.txt\
 
-    # Mount bootstrap linker configuration as current
-    mount none /linkerconfig/bootstrap /linkerconfig bind rec
-
-    start ueventd
-
-    # Run apexd-bootstrap so that APEXes that provide critical libraries
-    # become available. Note that this is executed as exec_start to ensure that
-    # the libraries are available to the processes started after this statement.
-    exec_start apexd-bootstrap
-
-    # Generate linker config based on apex mounted in bootstrap namespace
-    update_linker_config
-
-    # These must already exist by the time boringssl_self_test32 / boringssl_self_test64 run.
-    mkdir /dev/boringssl 0755 root root
-    mkdir /dev/boringssl/selftest 0755 root root
-
-    # Mount tracefs
-    mount tracefs tracefs /sys/kernel/tracing
-    
 on init
     mkdir /config
     mount configfs none /config
@@ -80,70 +52,6 @@ on init
     mkdir /config/usb_gadget/g1/configs/b.1/strings/0x409 0770 shell shell
     setprop sys.usb.configfs 1
 
-    restorecon_recursive /mnt
-
-    mount configfs none /config nodev noexec nosuid
-    chmod 0770 /config/sdcardfs
-    chown system package_info /config/sdcardfs
-
-    mkdir /mnt/secure 0700 root root
-    mkdir /mnt/secure/asec 0700 root root
-    mkdir /mnt/asec 0755 root system
-    mkdir /mnt/obb 0755 root system
-    mkdir /mnt/media_rw 0750 root external_storage
-    mkdir /mnt/user 0755 root root
-    mkdir /mnt/user/0 0755 root root
-    mkdir /mnt/user/0/self 0755 root root
-    mkdir /mnt/user/0/emulated 0755 root root
-    mkdir /mnt/user/0/emulated/0 0755 root root
-
-    # Prepare directories for pass through processes
-    mkdir /mnt/pass_through 0700 root root
-    mkdir /mnt/pass_through/0 0710 root media_rw
-    mkdir /mnt/pass_through/0/self 0710 root media_rw
-    mkdir /mnt/pass_through/0/emulated 0710 root media_rw
-    mkdir /mnt/pass_through/0/emulated/0 0710 root media_rw
-
-    mkdir /mnt/expand 0771 system system
-    mkdir /mnt/appfuse 0711 root root
-
-# Mount filesystems and start core system services.
-on late-init
-    trigger early-fs
-
-    # Mount fstab in init.{$device}.rc by mount_all command. Optional parameter
-    # '--early' can be specified to skip entries with 'latemount'.
-    # /system and /vendor must be mounted by the end of the fs stage,
-    # while /data is optional.
-    trigger fs
-    trigger post-fs
-
-    # Mount fstab in init.{$device}.rc by mount_all with '--late' parameter
-    # to only mount entries with 'latemount'. This is needed if '--early' is
-    # specified in the previous mount_all command on the fs stage.
-    # With /system mounted and properties form /system + /factory available,
-    # some services can be started.
-    trigger late-fs
-
-    # Now we can mount /data. File encryption requires keymaster to decrypt
-    # /data, which in turn can only be loaded when system properties are present.
-    trigger post-fs-data
-
-    # Load persist properties and override properties (if enabled) from /data.
-    trigger load_persist_props_action
-
-    # Should be before netd, but after apex, properties and logging is available.
-    trigger load_bpf_programs
-
-    # Now we can start zygote for devices with file based encryption
-    trigger zygote-start
-
-    # Remove a file to wake up anything waiting for firmware.
-    trigger firmware_mounts_complete
-
-    trigger early-boot
-    trigger boot
-
 on early-fs
     # Once metadata has been mounted, we'll need vold to deal with userdata checkpointing
     start vold
@@ -157,17 +65,6 @@ on fs
 on post-fs
 
     start boot-hal-1-1
-    exec - system system -- /system/bin/vdc checkpoint markBootAttempt
-
-    # Once everything is setup, no need to modify /.
-    # The bind+remount combination allows this to work in containers.
-    mount rootfs rootfs / remount bind ro nodev
-
-    # We chown/chmod /cache again so because mount is run as root + defaults
-    chown system cache /cache
-    chmod 0770 /cache
-    # We restorecon /cache in case the cache partition has been reset.
-    restorecon_recursive /cache
 
     # Create /cache/recovery in case it's not there. It'll also fix the odd
     # permissions if created by the recovery system.
@@ -210,123 +107,6 @@ on post-fs-data
 
     # Make sure we have the device encryption key.
     installkey /data
-
-    # Start bootcharting as soon as possible after the data partition is
-    # mounted to collect more data.
-    mkdir /data/bootchart 0755 shell shell encryption=Require
-    bootchart start
-
-    # Make sure that apexd is started in the default namespace
-    enter_default_mount_ns
-
-    # /data/apex is now available. Start apexd to scan and activate APEXes.
-    mkdir /data/apex 0755 root system encryption=None
-    mkdir /data/apex/active 0755 root system
-    mkdir /data/apex/backup 0700 root system
-    mkdir /data/apex/hashtree 0700 root system
-    mkdir /data/apex/sessions 0700 root system
-    mkdir /data/app-staging 0750 system system encryption=None
-    start apexd
-
-    # create basic filesystem structure
-    mkdir /data/misc 01771 system misc encryption=Require
-    mkdir /data/misc/recovery 0770 system log
-    copy /data/misc/recovery/ro.build.fingerprint /data/misc/recovery/ro.build.fingerprint.1
-    chmod 0440 /data/misc/recovery/ro.build.fingerprint.1
-    chown system log /data/misc/recovery/ro.build.fingerprint.1
-    write /data/misc/recovery/ro.build.fingerprint ${ro.build.fingerprint}
-    chmod 0440 /data/misc/recovery/ro.build.fingerprint
-    chown system log /data/misc/recovery/ro.build.fingerprint
-    mkdir /data/misc/recovery/proc 0770 system log
-    copy /data/misc/recovery/proc/version /data/misc/recovery/proc/version.1
-    chmod 0440 /data/misc/recovery/proc/version.1
-    chown system log /data/misc/recovery/proc/version.1
-    copy /proc/version /data/misc/recovery/proc/version
-    chmod 0440 /data/misc/recovery/proc/version
-    chown system log /data/misc/recovery/proc/version
-    mkdir /data/misc/bluedroid 02770 bluetooth bluetooth
-    # Fix the access permissions and group ownership for 'bt_config.conf'
-    chmod 0660 /data/misc/bluedroid/bt_config.conf
-    chown bluetooth bluetooth /data/misc/bluedroid/bt_config.conf
-    mkdir /data/misc/bluetooth 0771 bluetooth bluetooth
-    mkdir /data/misc/bluetooth/logs 0770 bluetooth log
-    mkdir /data/misc/credstore 0700 credstore credstore
-    mkdir /data/misc/keystore 0700 keystore keystore
-    mkdir /data/misc/gatekeeper 0700 system system
-    mkdir /data/misc/keychain 0771 system system
-    mkdir /data/misc/net 0750 root shell
-    mkdir /data/misc/radio 0770 system radio
-    mkdir /data/misc/sms 0770 system radio
-    mkdir /data/misc/carrierid 0770 system radio
-    mkdir /data/misc/apns 0770 system radio
-    mkdir /data/misc/emergencynumberdb 0770 system radio
-    mkdir /data/misc/zoneinfo 0775 system system
-    mkdir /data/misc/network_watchlist 0774 system system
-    mkdir /data/misc/textclassifier 0771 system system
-    mkdir /data/misc/vpn 0770 system vpn
-    mkdir /data/misc/shared_relro 0771 shared_relro shared_relro
-    mkdir /data/misc/systemkeys 0700 system system
-    mkdir /data/misc/wifi 0770 wifi wifi
-    mkdir /data/misc/wifi/sockets 0770 wifi wifi
-    mkdir /data/misc/wifi/wpa_supplicant 0770 wifi wifi
-    mkdir /data/misc/ethernet 0770 system system
-    mkdir /data/misc/dhcp 0770 dhcp dhcp
-    mkdir /data/misc/user 0771 root root
-    # give system access to wpa_supplicant.conf for backup and restore
-    chmod 0660 /data/misc/wifi/wpa_supplicant.conf
-    mkdir /data/local 0751 root root encryption=Require
-    mkdir /data/misc/media 0700 media media
-    mkdir /data/misc/audioserver 0700 audioserver audioserver
-    mkdir /data/misc/cameraserver 0700 cameraserver cameraserver
-    mkdir /data/misc/vold 0700 root root
-    mkdir /data/misc/boottrace 0771 system shell
-    mkdir /data/misc/update_engine 0700 root root
-    mkdir /data/misc/update_engine_log 02750 root log
-    mkdir /data/misc/trace 0700 root root
-    # create location to store surface and window trace files
-    mkdir /data/misc/wmtrace 0700 system system
-    # profile file layout
-    mkdir /data/misc/profiles 0771 system system
-    mkdir /data/misc/profiles/cur 0771 system system
-    mkdir /data/misc/profiles/ref 0770 system system
-    mkdir /data/misc/profman 0770 system shell
-    mkdir /data/misc/gcov 0770 root root
-    mkdir /data/misc/installd 0700 root root
-    mkdir /data/misc/apexdata 0711 root root
-    mkdir /data/misc/apexrollback 0700 root root
-    mkdir /data/misc/snapshotctl_log 0755 root root
-    # create location to store pre-reboot information
-    mkdir /data/misc/prereboot 0700 system system
-
-    mkdir /data/preloads 0775 system system encryption=None
-
-    mkdir /data/vendor 0771 root root encryption=Require
-    mkdir /data/vendor_ce 0771 root root encryption=None
-    mkdir /data/vendor_de 0771 root root encryption=None
-    mkdir /data/vendor/hardware 0771 root root
-
-    # create dalvik-cache, so as to enforce our permissions
-    mkdir /data/dalvik-cache 0771 root root encryption=Require
-    # create the A/B OTA directory, so as to enforce our permissions
-    mkdir /data/ota 0771 root root encryption=Require
-
-    # Create all remaining /data root dirs so that they are made through init
-    # and get proper encryption policy installed
-    mkdir /data/backup 0700 system system encryption=Require
-    mkdir /data/ss 0700 system system encryption=Require
-
-    mkdir /data/system 0775 system system encryption=Require
-    mkdir /data/system/dropbox 0700 system system
-    mkdir /data/system/heapdump 0700 system system
-    mkdir /data/system/users 0775 system system
-
-    mkdir /data/system_de 0770 system system encryption=None
-    mkdir /data/system_ce 0770 system system encryption=None
-
-    mkdir /data/misc_de 01771 system misc encryption=None
-    mkdir /data/misc_ce 01771 system misc encryption=None
-
-    mkdir /data/user 0711 system system encryption=None
     mkdir /data/user_de 0711 system system encryption=None
 
     # Unlink /data/user/0 if we previously symlink it to /data/data
@@ -336,84 +116,11 @@ on post-fs-data
     mkdir /data/user/0 0700 system system encryption=None
     mount none /data/data /data/user/0 bind rec
 
-     # Wait for apexd to finish activating APEXes before starting more processes.
-    wait_for_prop apexd.status activated
-    perform_apex_config
-
-    # Special-case /data/media/obb per b/64566063
-    mkdir /data/media 0770 media_rw media_rw encryption=None
-    exec - media_rw media_rw -- /system/bin/chattr +F /data/media
-
-    init_user0
-
-    # Allow apexd to snapshot and restore device encrypted apex data in the case
-    # of a rollback. This should be done immediately after DE_user data keys
-    # are loaded. APEXes should not access this data until this has been
-    # completed and apexd.status becomes "ready".
-    exec_start apexd-snapshotde
-
-    # Set SELinux security contexts on upgrade or policy update.
-    restorecon --recursive --skip-ce /data
-
-    # Check any timezone data in /data is newer than the copy in the time zone data
-    # module, delete if not.
-    exec - system system -- /system/bin/tzdatacheck /apex/com.android.tzdata/etc/tz /data/misc/zoneinfo
-
-    # Switch between sdcardfs and FUSE depending on persist property
-    # TODO: Move this to ro property before launch because FDE devices
-    # interact with persistent properties differently during boot
-on zygote-start && property:persist.sys.fuse=true
-  # Mount default storage into root namespace
-  mount none /mnt/user/0 /storage bind rec
-  mount none none /storage slave rec
-on zygote-start && property:persist.sys.fuse=false
-  # Mount default storage into root namespace
-  mount none /mnt/runtime/default /storage bind rec
-  mount none none /storage slave rec
-on zygote-start && property:persist.sys.fuse=""
-  # Mount default storage into root namespace
-  mount none /mnt/runtime/default /storage bind rec
-  mount none none /storage slave rec
-
-  # It is recommended to put unnecessary data/ initialization from post-fs-data
-# to start-zygote in device's init.rc to unblock zygote start.
-on zygote-start && property:ro.crypto.state=unencrypted
-    # A/B update verifier that marks a successful boot.
-    exec_start update_verifier_nonencrypted
-    start statsd
-    start netd
-    start zygote
-    start zygote_secondary
-
-on zygote-start && property:ro.crypto.state=unsupported
-    # A/B update verifier that marks a successful boot.
-    exec_start update_verifier_nonencrypted
-    start statsd
-    start netd
-    start zygote
-    start zygote_secondary
-
-on zygote-start && property:ro.crypto.state=encrypted && property:ro.crypto.type=file
-    # A/B update verifier that marks a successful boot.
-    exec_start update_verifier_nonencrypted
-    start statsd
-    start netd
-    start zygote
-    start zygote_secondary
-
-
 on boot
     start health-hal-2-1
     class_start hal
 
     class_start core
-
-    # Requires keystore (currently a core service) to be ready first.
-    exec -- /system/bin/fsverity_init
-
-on nonencrypted
-    class_start main
-    class_start late_start
 
 on property:ro.boot.usbcontroller=*
     setprop sys.usb.controller ${ro.boot.usbcontroller}
@@ -461,7 +168,6 @@ on property:ro.build.type=userdebug
 on property:ro.build.type=user
     chmod 0771 /data/anr
     chmod 01771 /data/misc
-
 
 service load_modules /system/bin/load_modules.sh
     oneshot
