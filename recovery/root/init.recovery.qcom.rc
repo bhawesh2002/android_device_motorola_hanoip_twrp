@@ -147,7 +147,15 @@ on early-fs
     # Once metadata has been mounted, we'll need vold to deal with userdata checkpointing
     start vold
 
+on fs
+    wait /dev/block/platform/soc/1d84000.ufshc
+    symlink /dev/block/platform/soc/1d84000.ufshc /dev/block/bootdevice/by-name
+    export LD_LIBRARY_PATH /sbin:/vendor/lib64:/vendor/lib64/hw
+    start load_modules
+
 on post-fs
+
+    start boot-hal-1-1
     exec - system system -- /system/bin/vdc checkpoint markBootAttempt
 
     # Once everything is setup, no need to modify /.
@@ -327,16 +335,6 @@ on property:sys.usb.config=fastboot && property:sys.usb.ffs.ready=1 && property:
     symlink /config/usb_gadget/g1/functions/ffs.fastboot /config/usb_gadget/g1/configs/b.1/f1
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}
-
-on fs
-    wait /dev/block/platform/soc/1d84000.ufshc
-    symlink /dev/block/platform/soc/1d84000.ufshc /dev/block/bootdevice/by-name
-    export LD_LIBRARY_PATH /sbin:/vendor/lib64:/vendor/lib64/hw
-    start load_modules
-    
-    
-on post-fs
-    start boot-hal-1-1
 
 on property:ro.crypto.type=file
     setprop ro.crypto.state=encrypted
