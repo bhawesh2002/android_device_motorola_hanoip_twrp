@@ -309,6 +309,32 @@ on post-fs-data
     # create the A/B OTA directory, so as to enforce our permissions
     mkdir /data/ota 0771 root root encryption=Require
 
+    # Create all remaining /data root dirs so that they are made through init
+    # and get proper encryption policy installed
+    mkdir /data/backup 0700 system system encryption=Require
+    mkdir /data/ss 0700 system system encryption=Require
+
+    mkdir /data/system 0775 system system encryption=Require
+    mkdir /data/system/dropbox 0700 system system
+    mkdir /data/system/heapdump 0700 system system
+    mkdir /data/system/users 0775 system system
+
+    mkdir /data/system_de 0770 system system encryption=None
+    mkdir /data/system_ce 0770 system system encryption=None
+
+    mkdir /data/misc_de 01771 system misc encryption=None
+    mkdir /data/misc_ce 01771 system misc encryption=None
+
+    mkdir /data/user 0711 system system encryption=None
+    mkdir /data/user_de 0711 system system encryption=None
+
+    # Unlink /data/user/0 if we previously symlink it to /data/data
+    rm /data/user/0
+
+    # Bind mount /data/user/0 to /data/data
+    mkdir /data/user/0 0700 system system encryption=None
+    mount none /data/data /data/user/0 bind rec
+
 
 on boot
     start health-hal-2-1
