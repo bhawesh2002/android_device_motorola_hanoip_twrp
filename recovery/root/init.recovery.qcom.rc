@@ -84,7 +84,18 @@ on init
     mount configfs none /config nodev noexec nosuid
     chmod 0770 /config/sdcardfs
     chown system package_info /config/sdcardfs
-    
+
+    mkdir /mnt/secure 0700 root root
+    mkdir /mnt/secure/asec 0700 root root
+    mkdir /mnt/asec 0755 root system
+    mkdir /mnt/obb 0755 root system
+    mkdir /mnt/media_rw 0750 root external_storage
+    mkdir /mnt/user 0755 root root
+    mkdir /mnt/user/0 0755 root root
+    mkdir /mnt/user/0/self 0755 root root
+    mkdir /mnt/user/0/emulated 0755 root root
+    mkdir /mnt/user/0/emulated/0 0755 root root
+
 on boot
     start health-hal-2-1
 
