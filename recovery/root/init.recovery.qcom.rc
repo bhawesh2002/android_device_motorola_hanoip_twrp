@@ -29,9 +29,7 @@ import /init.recovery.qcom_decrypt.rc
 
 on early-init
     start fstab_fixup
-on early-init
-    exec u:r:vendor_modprobe:s0 -- /vendor/bin/modprobe -a -d \
-        /vendor/lib/modules aw8646.ko exfat.ko fpc1020_mmi.ko ilitek_v3_mmi.ko mmi_annotate.ko mmi_info.ko mmi_sys_temp.ko moto_f_usbnet.ko sensors_class.ko snd_smartpa_aw882xx.ko utags.ko ...
+    
 on init
     mkdir /config
     mount configfs none /config
