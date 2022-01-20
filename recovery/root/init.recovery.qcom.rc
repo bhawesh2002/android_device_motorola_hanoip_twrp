@@ -25,11 +25,10 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import /init.recovery.qcom_decrypt.rc
-import /init.recovery.qcom_decrypt.fbe.rc
-
 on early-init
     start fstab_fixup
+    
+    start ueventd
 
 on init
     mkdir /config
@@ -51,76 +50,29 @@ on init
     symlink /config/usb_gadget/g1/configs/b.1 /config/usb_gadget/g1/os_desc/b.1
     mkdir /config/usb_gadget/g1/configs/b.1/strings/0x409 0770 shell shell
     setprop sys.usb.configfs 1
+    #create presist
+    mkdir /mnt/vendor/persist 0700 root root
+    mount ext4 /dev/block/platform/bootdevice/by-name/persist /mnt/vendor/persist
+
+on late-init
+    trigger early-fs
+    trigger fs
+    trigger post-fs
+
+    # Mount fstab in init.{$device}.rc by mount_all with '--late' parameter
+    # to only mount entries with 'latemount'. This is needed if '--early' is
+    # specified in the previous mount_all command on the fs stage.
+    # With /system mounted and properties form /system + /factory available,
+    # some services can be started.
+    trigger late-fs
+
+    # Now we can mount /data. File encryption requires keymaster to decrypt
+    # /data, which in turn can only be loaded when system properties are present.
+    trigger post-fs-data
 
 on early-fs
     # Once metadata has been mounted, we'll need vold to deal with userdata checkpointing
     start vold
-
-on fs
-    wait /dev/block/platform/soc/1d84000.ufshc
-    symlink /dev/block/platform/soc/1d84000.ufshc /dev/block/bootdevice/by-name
-    export LD_LIBRARY_PATH /sbin:/vendor/lib64:/vendor/lib64/hw
-    start load_modules
-
-on post-fs
-
-    start boot-hal-1-1
-
-    # Create /cache/recovery in case it's not there. It'll also fix the odd
-    # permissions if created by the recovery system.
-    mkdir /cache/recovery 0770 system cache
-
-        restorecon_recursive /metadata
-    mkdir /metadata/vold
-    chmod 0700 /metadata/vold
-    mkdir /metadata/password_slots 0771 root system
-    mkdir /metadata/bootstat 0750 system log
-    mkdir /metadata/ota 0700 root system
-    mkdir /metadata/ota/snapshots 0700 root system
-
-    mkdir /metadata/apex 0700 root system
-    mkdir /metadata/apex/sessions 0700 root system
-    # On some devices we see a weird behaviour in which /metadata/apex doesn't
-    # have a correct label. To workaround this bug, explicitly call restorecon
-    # on /metadata/apex. For most of the boot sequences /metadata/apex will
-    # already have a correct selinux label, meaning that this call will be a
-    # no-op.
-    restorecon_recursive /metadata/apex
-
-    mkdir /metadata/staged-install 0770 root system
-
-on late-fs
-    # HALs required before storage encryption can get unlocked (FBE/FDE)
-    class_start early_hal
-
-on post-fs-data
-    mark_post_data
-
-    # Start checkpoint before we touch data
-    exec - system system -- /system/bin/vdc checkpoint prepareCheckpoint
-
-    # We chown/chmod /data again so because mount is run as root + defaults
-    chown system system /data
-    chmod 0771 /data
-    # We restorecon /data in case the userdata partition has been reset.
-    restorecon /data
-
-    # Make sure we have the device encryption key.
-    installkey /data
-    mkdir /data/user_de 0711 system system encryption=None
-
-    # Unlink /data/user/0 if we previously symlink it to /data/data
-    rm /data/user/0
-
-    # Bind mount /data/user/0 to /data/data
-    mkdir /data/user/0 0700 system system encryption=None
-    mount none /data/data /data/user/0 bind rec
-
-on boot
-    start health-hal-2-1
-    class_start hal
-
-    class_start core
 
 on property:ro.boot.usbcontroller=*
     setprop sys.usb.controller ${ro.boot.usbcontroller}
@@ -150,10 +102,116 @@ on property:sys.usb.config=fastboot && property:sys.usb.ffs.ready=1 && property:
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}
 
+on fs
+    wait /dev/block/platform/soc/${ro.boot.bootdevice}
+    symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
+    export LD_LIBRARY_PATH /sbin:/vendor/lib64:/vendor/lib64/hw
+    start load_modules
+
+on post-fs
+    start boot-hal-1-1
+    
+on late-fs
+    # HALs required before storage encryption can get unlocked (FBE/FDE)
+    class_start early_hal
+    
+on post-fs-data
+    mark_post_data
+
+    # Start checkpoint before we touch data
+    exec - system system -- /system/bin/vdc checkpoint prepareCheckpoint
+
+    # We chown/chmod /data again so because mount is run as root + defaults
+    chown system system /data
+    chmod 0771 /data
+    # We restorecon /data in case the userdata partition has been reset.
+    restorecon /data
+
+    # Make sure we have the device encryption key.
+    installkey /data
+
+    # Start bootcharting as soon as possible after the data partition is
+    # mounted to collect more data.
+    mkdir /data/bootchart 0755 shell shell encryption=Require
+    bootchart start
+    
+on boot
+    start health-hal-2-1
+    class_start hal
+
+    class_start core
+
+    # Requires keystore (currently a core service) to be ready first.
+    exec -- /system/bin/fsverity_init
+
+on nonencrypted
+    class_start main
+    class_start late_start
+
+service keystore_cli_v2 /system/bin/keystore_cli_v2
+    oneshot
+    user system
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service keystore /system/bin/keystore /tmp/misc/keystore
+    user root
+    group root drmrpc readproc
+    disabled
+    seclabel u:r:recovery:s0
+
+service gatekeeper-1-0 /vendor/bin/hw/android.hardware.gatekeeper@1.0-service-qti
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service keymaster-4-1 /vendor/bin/hw/android.hardware.keymaster@4.1-service-qti
+    user root
+    group root drmrpc
+    disabled
+    seclabel u:r:recovery:s0
+
+service load_modules /system/bin/load_modules.sh
+    oneshot
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service fstab_fixup /system/bin/fstab_fixup.sh
+    oneshot
+    disabled
+    user root
+    group root
+    seclabel u:r:recovery:s0
+
+on property:ro.boot.usbcontroller=*
+    setprop sys.usb.controller ${ro.boot.usbcontroller}
+    write /sys/class/udc/${ro.boot.usbcontroller}/device/../mode peripheral
+    
 on property:ro.crypto.type=file
     setprop ro.crypto.state=encrypted
     setprop twrp.apex.loaded=true
+    stop keymaster-4-0
+    stop gatekeeper-1-0
+    
+on property:ro.crypto.state=unsupported
+    
+    stop keymaster-4-0
+    stop gatekeeper-1-0
 
+on property:ro.crypto.state=unencrypted
+    
+    stop keymaster-4-0
+    stop gatekeeper-1-0
+
+on property:twrp.decrypt.done=true
+    
+    stop keymaster-4-0
+    stop gatekeeper-1-0
+    
 on property:sys.boot_completed=1 && property:sys.init.userspace_reboot.in_progress=1
   setprop sys.init.userspace_reboot.in_progress ""
 
@@ -169,16 +227,4 @@ on property:ro.build.type=user
     chmod 0771 /data/anr
     chmod 01771 /data/misc
 
-service load_modules /system/bin/load_modules.sh
-    oneshot
-    user root
-    group root
-    disabled
-    seclabel u:r:recovery:s0
-
-service fstab_fixup /system/bin/fstab_fixup.sh
-    oneshot
-    disabled
-    user root
-    group root
-    seclabel u:r:recovery:s0
+import /init.recovery.qcom_decrypt.rc
