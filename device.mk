@@ -39,16 +39,10 @@ AB_OTA_PARTITIONS += \
     vbmeta_system \
     vendor_boot 
 
-
-PRODUCT_COPY_FILES += \
-	$(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/fstab.qcom
-
 PRODUCT_COPY_FILES += \
 	$(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom
 PRODUCT_COPY_FILES += \
     	$(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_RAMDISK)/fstab.qcom
-PRODUCT_COPY_FILES += \
-        $$(LOCAL_PATH)/fstab.qcom:$(TARGET_COPY_OUT_RECOVERY)/root/first_stage_ramdisk/fstab.qcom
 	
 #PRODUCT_COPY_FILES += \
 #    $(PLATFORM_PATH)/recovery/root/vendor/lib/modules/aw8646.ko:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/modules/aw8646.ko \
