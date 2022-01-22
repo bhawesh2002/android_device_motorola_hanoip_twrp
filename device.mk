@@ -84,9 +84,6 @@ PRODUCT_PACKAGES += \
     fstab.qcom \
 
 PRODUCT_PACKAGES += \
-    vendor.qti.hardware.cryptfshw@1.0.vendor
-
-PRODUCT_PACKAGES += \
     fs_config_files
 
 # Apex libraries
