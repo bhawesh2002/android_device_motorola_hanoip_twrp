@@ -58,43 +58,32 @@ BOARD_PROVIDES_GPTUTILS := true
 # Kernel
 BOARD_KERNEL_IMAGE_NAME := Image.gz
 
-BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 androidboot.hardware=qcom androidboot.console=ttyMSM0 androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=1 androidboot.usbcontroller=a600000.dwc3 earlycon=msm_geni_serial,0x880000 loop.max_part=7 printk.devkmsg=on androidboot.hab.csv=5 androidboot.hab.product=hanoip androidboot.hab.cid=50 firmware_class.path=/vendor/firmware_mnt/image buildvariant=user
-#BOARD_KERNEL_CMDLINE := \
-#console=ttyMSM0,115200n8 \
-#androidboot.console=ttyMSM0 \
-#androidboot.hardware=qcom \
-#androidboot.baseband=msm \
-#video=vfb:640x400,bpp=32,memsize=3072000 \
-#androidboot.usbcontroller=a600000.dwc3 \
-#androidboot.memcg=1 \
-#msm_rtb.filter=0x237 \
-#service_locator.enable=1 \
-#swiotlb=1 \
-#loop.max_part=7 \
-#printk.devkmsg=on \
-#androidboot.hab.csv=5 \
-#androidboot.hab.product=hanoip \
-#firmware_class.path=/vendor/firmware_mnt/image \
-#androidboot.verifiedbootstate=orange \
-#androidboot.keymaster=1 \
-#androidboot.vbmeta.device=PARTUUID=53fd77d8-b172-9209-9061-9355a75e8b9b \
-#androidboot.vbmeta.avb_version=1.0 \
-#androidboot.vbmeta.device_state=unlocked \
-#androidboot.vbmeta.hash_alg=sha256 \
-#androidboot.vbmeta.size=6464 \
-#androidboot.vbmeta.digest=94c13e24836a893accfd1a9883b9fe896cad58ad61387c0074250adb75a0a85a \
-#androidboot.veritymode=enforcing \
-#androidboot.bootdevice=1d84000.ufshc \
-#androidboot.fstab_suffix=default \
-#androidboot.boot_devices=soc/1d84000.ufshc \
-#androidboot.device=hanoip \
-#androidboot.mode=normal \
-#androidboot.baseband=msm \
-#msm_drm.dsi_display0=dsi_ili7807s_tm_678_vid_display: \
-#androidboot.dtbo_idx=0 \
-#androidboot.dtb_idx=0 \
-#androidboot.force_normal_boot=1
-
+BOARD_KERNEL_CMDLINE += console=ttyMSM0,115200n8 androidboot.console=ttyMSM0 printk.devkmsg=on
+BOARD_KERNEL_CMDLINE += msm_rtb.filter=0x237
+BOARD_KERNEL_CMDLINE += ehci-hcd.park=3
+BOARD_KERNEL_CMDLINE += service_locator.enable=1
+BOARD_KERNEL_CMDLINE += androidboot.memcg=1 androidboot.hardware=qcom androidboot.force_normal_boot=1 androidboot.bootdevice=1d84000.ufshc androidboot.boot_devices=soc/1d84000.ufshc
+BOARD_KERNEL_CMDLINE += lpm_levels.sleep_disabled=1
+BOARD_KERNEL_CMDLINE += video=vfb:640x400,bpp=32,memsize=3072000
+BOARD_KERNEL_CMDLINE += androidboot.usbcontroller=a600000.dwc3 swiotlb=2048
+BOARD_KERNEL_CMDLINE += 
+BOARD_KERNEL_CMDLINE += loop.max_part=7
+BOARD_KERNEL_CMDLINE += earlycon=msm_geni_serial,0x880000
+BOARD_KERNEL_CMDLINE += androidboot.hab.csv=5
+BOARD_KERNEL_CMDLINE += androidboot.hab.product=hanoip
+BOARD_KERNEL_CMDLINE += androidboot.hab.cid=50
+BOARD_KERNEL_CMDLINE += firmware_class.path=/vendor/firmware_mnt/image
+BOARD_KERNEL_CMDLINE += buildvariant=user
+BOARD_KERNEL_CMDLINE += androidboot.keymaster=1
+BOARD_KERNEL_CMDLINE += androidboot.vbmeta.device=PARTUUID=53fd77d8-b172-9209-9061-9355a75e8b9b
+BOARD_KERNEL_CMDLINE += androidboot.vbmeta.avb_version=1.0
+BOARD_KERNEL_CMDLINE += androidboot.vbmeta.device_state=unlocked
+BOARD_KERNEL_CMDLINE += androidboot.vbmeta.hash_alg=sha256
+BOARD_KERNEL_CMDLINE += androidboot.vbmeta.size=6464
+BOARD_KERNEL_CMDLINE += androidboot.vbmeta.digest=94c13e24836a893accfd1a9883b9fe896cad58ad61387c0074250adb75a0a85a
+BOARD_KERNEL_CMDLINE += androidboot.veritymode=enforcing
+BOARD_KERNEL_CMDLINE += androidboot.fastboot=1
+BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
 BOARD_KERNEL_CMDLINE += androidboot.fastboot=1
 BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
 
