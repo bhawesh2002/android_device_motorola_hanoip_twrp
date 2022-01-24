@@ -126,6 +126,7 @@ PRODUCT_PACKAGES += \
 
 # Storage health HAL
 PRODUCT_PACKAGES += \
+<<<<<<< HEAD
     android.hardware.health.storage@1.0
 
 PRODUCT_PACKAGES += \
@@ -133,6 +134,8 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
     fs_config_dirs \
+=======
+>>>>>>> 48d3b6569f9ad45664aed8a074eab9f6ce1932e0
     fs_config_files
 PRODUCT_PACKAGES += \
     android.hardware.keymaster@4.1 \
