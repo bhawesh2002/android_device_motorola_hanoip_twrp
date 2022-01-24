@@ -18,9 +18,15 @@
 # Inherit from the common Open Source product configuration
 $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
 
+# Enable project quotas and casefolding for emulated storage without sdcardfs
+$(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
+
 # define hardware platform
 PRODUCT_PLATFORM := sm6150
 PLATFORM_PATH := device/motorola/hanoip
+
+# Dynamic partitions
+PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
 # A/B support
 AB_OTA_UPDATER := true
@@ -30,22 +36,34 @@ AB_OTA_UPDATER := true
 # more partitions to this list for the bootloader and radio.
 AB_OTA_PARTITIONS += \
     boot \
+    vendor_boot \
+    system \
+    vbmeta \
     dtbo \
     product \
-    system \
-    system_ext \
-    vendor \
-    vbmeta \
     vbmeta_system \
-    vendor_boot 
+    system_ext
+
+# Use Sdcardfs
+PRODUCT_PRODUCT_PROPERTIES += \
+    ro.sys.sdcardfs=1
 
 PRODUCT_COPY_FILES += \
-	$(PRODUCT_PLATFORM)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom
-PRODUCT_COPY_FILES += \
-    	$(PRODUCT_PLATFORM)/fstab.qcom:$(TARGET_COPY_OUT_RAMDISK)/fstab.qcom
-PRODUCT_COPY_FILES += \	
-	$(PRODUCT_PLATFORM)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/fstab.qcom
+    $(PLATFORM_PATH)/fstab.qcom:$(TARGET_COPY_OUT_RECOVERY)/root/first_stage_ramdisk/fstab.$(PRODUCT_PLATFORM) \
+    $(PLATFORM_PATH)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/fstab.$(PRODUCT_PLATFORM) \
+    $(PLATFORM_PATH)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.$(PRODUCT_PLATFORM) \
 
+# Use /product/etc/fstab.postinstall to mount system_other
+PRODUCT_PRODUCT_PROPERTIES += \
+    ro.postinstall.fstab.prefix=/product
+
+PRODUCT_COPY_FILES += \
+    $(PLATFORM_PATH)/fstab.postinstall:$(TARGET_COPY_OUT_PRODUCT)/etc/fstab.postinstall
+
+PRODUCT_COPY_FILES += \
+   	$(PLATFORM_PATH)/recovery/root/ueventd.rc:$(TARGET_COPY_OUT_VENDOR)/ueventd.rc
+
+# A/B support
 PRODUCT_PACKAGES += \
     otapreopt_script \
     cppreopts.sh \
@@ -53,8 +71,24 @@ PRODUCT_PACKAGES += \
     update_verifier
 
 PRODUCT_PACKAGES += \
-    bootctrl.$(PRODUCT_PLATFORM) \
-    update_engine_sideload
+    e2fsck_ramdisk \
+    tune2fs_ramdisk \
+    resize2fs_ramdisk
+
+PRODUCT_PACKAGES += \
+    bootctrl.sm6150 \
+    bootctrl.sm6150.recovery
+
+PRODUCT_PACKAGES += \
+    update_engine_sideload \
+    sg_write_buffer \
+    f2fs_io \
+    check_f2fs
+
+PRODUCT_PACKAGES_DEBUG += \
+    bootctl \
+    r.vendor \
+    update_engine_client
 
 AB_OTA_POSTINSTALL_CONFIG += \
     RUN_POSTINSTALL_system=true \
@@ -69,32 +103,54 @@ TARGET_ENFORCE_AB_OTA_PARTITIPLATFORM_PATHON_LIST := true
 
 # Boot control HAL
 PRODUCT_PACKAGES += \
-    android.hardware.boot@1.0-impl \
-    android.hardware.boot@1.0-service \
-    android.hardware.boot@1.0-impl-wrapper.recovery \
-    android.hardware.boot@1.0-impl-wrapper \
-    android.hardware.boot@1.0-impl.recovery \
-    bootctrl.$(PRODUCT_PLATFORM) \
-    bootctrl.$(PRODUCT_PLATFORM).recovery
+    android.qcom.boot@1.1-impl \
+    android.qcom.boot@1.1-service \
+    android.qcom.boot@1.1-impl-wrapper.recovery \
+    android.qcom.boot@1.1-impl-wrapper \
+    android.qcom.boot@1.1-impl.recovery \
 
-PRODUCT_PACKAGES_DEBUG += \
-    bootctl
+# Memtrack HAL
+PRODUCT_PACKAGES += \
+    memtrack.sm6150 \
+    android.hardware.memtrack@1.0-impl \
+    android.hardware.memtrack@1.0-service
+
+# DRM HAL
+PRODUCT_PACKAGES += \
+    android.hardware.drm@1.3-service.clearkey \
+    android.hardware.drm@1.3-service.widevine
+
+PRODUCT_PACKAGES += \
+    android.hardware.health@2.1-impl-qti \
+    android.hardware.health@2.1-service
+
+# Storage health HAL
+PRODUCT_PACKAGES += \
+    android.hardware.health.storage@1.0
 
 PRODUCT_PACKAGES += \
     fstab.qcom \
 
 PRODUCT_PACKAGES += \
-    vendor.qti.hardware.cryptfshw@1.0.vendor
-
-PRODUCT_PACKAGES += \
+    fs_config_dirs \
     fs_config_files
+PRODUCT_PACKAGES += \
+    android.hardware.keymaster@4.1 \
+    android.hardware.identity-support-lib
+ 
+# fastbootd
+PRODUCT_PACKAGES += \
+    android.hardware.fastboot@1.0-impl-mock \
+    fastbootd
+
+# Keymaster configuration
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/android.software.device_id_attestation.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.device_id_attestation.xml \
+
 
 # Apex libraries
 PRODUCT_HOST_PACKAGES += \
     libandroidicu
-
-# Dynamic partitions
-PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
 # qcom standard decryption
 PRODUCT_PACKAGES += \
@@ -103,7 +159,7 @@ PRODUCT_PACKAGES += \
 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
-    $(LOCAL_PATH)
+    $(PLATFORM_PATH)
 
 # tzdata
 PRODUCT_PACKAGES += \
@@ -121,3 +177,10 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.vendor.build.security_patch=2021-09-01   
+    
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.crypto.volume.filenames_mode=aes-256-cts
+
+# Storage: for factory reset protection feature
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.frp.pst=/dev/block/bootdevice/by-name/frp
