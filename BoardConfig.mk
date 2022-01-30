@@ -174,58 +174,58 @@ BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
 # because some kernel configurations may have extra debug or test modules,
 # make sure any required to be loaded during first stage init are listed.
 
-BOOT_KERNEL_MODULES := \
-	audio_apr.ko \
-	audio_snd_event.ko \
-	audio_wglink.ko \
-	audio_q6_pdr.ko \
-	audio_q6_notifier.ko \
-	audio_adsp_loader.ko \
-	audio_q6.ko \
-	audio_usf.ko \
-	audio_pinctrl_wcd.ko \
-	audio_pinctrl_lpi.ko \
-	audio_swr.ko \
-	audio_wcd_core.ko \
-	audio_swr_ctrl.ko \
-	audio_wsa881x.ko \
-	audio_platform.ko \
-	audio_hdmi.ko \
-	audio_stub.ko \
-	audio_wcd9xxx.ko \
-	audio_mbhc.ko \
-	audio_wcd934x.ko \
-	audio_wcd937x.ko \
-	audio_wcd937x_slave.ko \
-	audio_bolero_cdc.ko \
-	audio_wsa_macro.ko \
-	audio_va_macro.ko \
-	audio_rx_macro.ko \
-	audio_tx_macro.ko \
-	audio_wcd_spi.ko \
-	audio_native.ko \
-	audio_machine_talos.ko \
-	mpq-adapter.ko \
-	mpq-dmx-hw-plugin.ko \
-	qca_cld3_wlan.ko \
-	rdbg.ko \
-	exfat.ko \
-	mmi_sys_temp.ko \
-	sensors_class.ko \
-	utags.ko \
-	moto_f_usbnet.ko \
-	watchdogtest.ko \
-	mmi_info.ko \
-	mmi_annotate.ko \
-	tzlog_dump.ko \
-	watchdog_cpu_ctx.ko \
-	fpsensor_spi_tee.ko \
-	fpc1020_mmi.ko \
-	ilitek_v3_mmi.ko \
-	sx933x_sar.ko \
-	snd_smartpa_aw882xx.ko \
-	qpnp_adaptive_charge.ko 
-	
+#BOOT_KERNEL_MODULES := \
+#audio_apr.ko \
+#audio_snd_event.ko \
+#audio_wglink.ko \
+#audio_q6_pdr.ko \
+#audio_q6_notifier.ko \
+#audio_adsp_loader.ko \
+#audio_q6.ko \
+#audio_usf.ko \
+#audio_pinctrl_wcd.ko \
+#audio_pinctrl_lpi.ko \
+#audio_swr.ko \
+#audio_wcd_core.ko \
+#audio_swr_ctrl.ko \
+#audio_wsa881x.ko \
+#audio_platform.ko \
+#audio_hdmi.ko \
+#audio_stub.ko \
+#audio_wcd9xxx.ko \
+#audio_mbhc.ko \
+#audio_wcd934x.ko \
+#audio_wcd937x.ko \
+#audio_wcd937x_slave.ko \
+#audio_bolero_cdc.ko \
+#audio_wsa_macro.ko \
+#audio_va_macro.ko \
+#audio_rx_macro.ko \
+#audio_tx_macro.ko \
+#audio_wcd_spi.ko \
+#audio_native.ko \
+#audio_machine_talos.ko \
+#mpq-adapter.ko \
+#mpq-dmx-hw-plugin.ko \
+#qca_cld3_wlan.ko \
+#rdbg.ko \
+#exfat.ko \
+#mmi_sys_temp.ko \
+#sensors_class.ko \
+#utags.ko \
+#moto_f_usbnet.ko \
+#watchdogtest.ko \
+#mmi_info.ko \
+#mmi_annotate.ko \
+#tzlog_dump.ko \
+#watchdog_cpu_ctx.ko \
+#fpsensor_spi_tee.ko \
+#fpc1020_mmi.ko \
+#ilitek_v3_mmi.ko \
+#sx933x_sar.ko \
+#snd_smartpa_aw882xx.ko \
+#qpnp_adaptive_charge.ko 
+#
 #symlink folders
 BOARD_ROOT_EXTRA_SYMLINKS := /vendor/lib/dsp:/dsp
 BOARD_ROOT_EXTRA_SYMLINKS += /mnt/vendor/persist:/persist
@@ -257,14 +257,14 @@ BOARD_USES_RECOVERY_AS_BOOT := true
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
 
 # Kernel modules
-KERNEL_MODULE_DIR := $(PLATFORM_PATH)/recovery/root/vendor/lib/modules
-KERNEL_MODULES := $(wildcard $(KERNEL_MODULE_DIR)/*.ko)
-KERNEL_MODULES_LOAD := $(KERNEL_MODULE_DIR)/modules.load
-BOARD_VENDOR_KERNEL_MODULES := $(KERNEL_MODULES)
-OARD_VENDOR_KERNEL_MODULES_LOAD := $(KERNEL_MODULES_LOAD)
-BOARD_VENDOR_RAMDISK_KERNEL_MODULES := $(KERNEL_MODULES)
-BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD := $(KERNEL_MODULES_LOAD)
-RECOVERY_KERNEL_MODULES := $(BOOT_KERNEL_MODULES)
+#KERNEL_MODULE_DIR := $(PLATFORM_PATH)/recovery/root/vendor/lib/modules
+#KERNEL_MODULES := $(wildcard $(KERNEL_MODULE_DIR)/*.ko)
+#KERNEL_MODULES_LOAD := $(KERNEL_MODULE_DIR)/modules.load
+#BOARD_VENDOR_KERNEL_MODULES := $(KERNEL_MODULES)
+#BOARD_VENDOR_KERNEL_MODULES_LOAD := $(KERNEL_MODULES_LOAD)
+#BOARD_VENDOR_RAMDISK_KERNEL_MODULES := $(KERNEL_MODULES)
+#BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD := $(KERNEL_MODULES_LOAD)
+#RECOVERY_KERNEL_MODULES := $(BOOT_KERNEL_MODULES)
 
 # Encryption
 PLATFORM_VERSION := 16.1.0
