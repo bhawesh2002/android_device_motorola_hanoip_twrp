@@ -89,7 +89,16 @@ PRODUCT_SOONG_NAMESPACES += \
     vendor/qcom/opensource/commonsys-intf/display
 
 PRODUCT_SOONG_NAMESPACES += \
-    $(LOCAL_PATH) \
+    $(LOCAL_PATH)
+
+# Update engine
+PRODUCT_PACKAGES += \
+    update_engine \
+    update_engine_sideload \
+    update_verifier
+
+PRODUCT_PACKAGES_DEBUG += \
+    update_engine_client
 
 # Crypto
 TW_INCLUDE_CRYPTO := true
