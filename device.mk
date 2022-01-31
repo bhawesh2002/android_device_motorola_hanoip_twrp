@@ -65,6 +65,12 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES_DEBUG += \
     bootctl
 
+# Common init scripts
+PRODUCT_PACKAGES += \
+	fstab.qcom \
+	ueventd.qcom.rc \
+	init.qcom.rc \
+	init.qcom.usb.rc
 
 #qcom standard decryption
 PRODUCT_PACKAGES += \
