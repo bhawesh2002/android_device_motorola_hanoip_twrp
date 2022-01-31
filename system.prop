@@ -1,0 +1,18 @@
+ro.board.platform=sm6150
+
+#adb
+sys.usb.config=mtp,adb
+sys.usb.state=mtp,adb
+persist.sys.usb.config=adb
+ro.adb.secure=0
+
+#boot props
+ro.boot.boot_devices=soc/1d84000.ufshc
+ro.boot.bootdevice=1d84000.ufshc
+ro.boot.bootloader=MBM-3.0-hanoip_retail-c29b299de02-210914
+ro.bootimage.build.fingerprint=motorola/hanoip_retail/hanoip:11/RRI31.Q1-42-48/222fd:user/release-keys
+
+#VNDK
+ro.product.vndk.version=30
+
+ro.product.model=moto g(40) fusion
