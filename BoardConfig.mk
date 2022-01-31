@@ -80,3 +80,6 @@ AB_OTA_PARTITIONS += \
     vbmeta_system \
     vendor \
     vendor_boot
+
+# Metadata
+BOARD_USES_METADATA_PARTITION := true
