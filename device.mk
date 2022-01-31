@@ -41,6 +41,8 @@ PRODUCT_SHIPPING_API_LEVEL := 30
 PRODUCT_PACKAGES += \
     qcom_decrypt \
     qcom_decrypt_fbe
+PRODUCT_SOONG_NAMESPACES += \
+    vendor/qcom/opensource/commonsys-intf/display
 
 # Crypto
 TW_INCLUDE_CRYPTO := true
