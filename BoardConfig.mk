@@ -16,6 +16,8 @@
 
 BUILD_BROKEN_DUP_RULES := true
 
+ALLOW_MISSING_DEPENDENCIES=true
+
 BOARD_VENDOR := motorola
 
 DEVICE_PATH := device/motorola/hanoip
