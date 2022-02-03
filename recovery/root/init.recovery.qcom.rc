@@ -1,106 +1,32 @@
-import /init.recovery.qcom_decrypt.rc
-
-on early-init
-    # Set the security context of /postinstall if present.
-    restorecon /postinstall
-
-    # Copy prebuilt ld.config.txt into linkerconfig directory
-    copy /system/etc/ld.config.txt /linkerconfig/ld.config.txt
-    chmod 444 /linkerconfig/ld.config.txt
-
-    start ueventd
-
-    setprop sys.usb.configfs 0
-
-on init
-    export ANDROID_ROOT /system
-    export ANDROID_DATA /data
-    export EXTERNAL_STORAGE /sdcard
-
-    symlink /proc/self/fd/0 /dev/stdin
-    symlink /proc/self/fd/1 /dev/stdout
-    symlink /proc/self/fd/2 /dev/stderr
-
-    symlink /system/bin /bin
-    symlink /system/etc /etc
-
-    mount cgroup none /acct cpuacct
-    mkdir /acct/uid
-
-    mkdir /sdcard
-    mkdir /system
-    mkdir /data
-    mkdir /cache
-    mkdir /sideload
-    mkdir /mnt/system
-    mount tmpfs tmpfs /tmp
-
-    chown root shell /tmp
-    chmod 0775 /tmp
-
-    write /proc/sys/kernel/panic_on_oops 1
-    write /proc/sys/vm/max_map_count 1000000
-
-on boot
-    ifup lo
-    hostname localhost
-    domainname localdomain
-
-    class_start default
-
-on firmware_mounts_complete
-   rm /dev/.booting
-
-# Mount filesystems and start core system services.
-on late-init
-    trigger early-fs
-    trigger fs
-    trigger post-fs
-    trigger post-fs-data
-
-    # Remove a file to wake up anything waiting for firmware
-    trigger firmware_mounts_complete
-
-    trigger early-boot
-    trigger boot
-
-service ueventd /system/bin/ueventd
-    critical
-    seclabel u:r:ueventd:s0
-
-service charger /system/bin/charger
-    critical
-    seclabel u:r:charger:s0
-
-service recovery /system/bin/recovery
-    socket recovery stream 422 system system
-    seclabel u:r:recovery:s0
-
-service adbd /system/bin/adbd --root_seclabel=u:r:su:s0 --device_banner=recovery
-    disabled
-    socket adbd stream 660 system system
-    seclabel u:r:adbd:s0
-
-service fastbootd /system/bin/fastbootd
-    disabled
-    group system
-    seclabel u:r:fastbootd:s0
-
-# Restart adbd so it can run as root
-on property:service.adb.root=1
-    restart adbd
+# Copyright (c) 2017-2018, The Linux Foundation. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of The Linux Foundation nor
+#       the names of its contributors may be used to endorse or promote
+#       products derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NON-INFRINGEMENT ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
 on fs
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
-    
-service variant-script /system/bin/variant-script.sh
-    user root
-    group root
-    disabled
-    oneshot
-    seclabel u:r:recovery:s0
 
-on property:ro.boot.usbcontroller=*
-    setprop sys.usb.controller ${ro.boot.usbcontroller}
-    write /sys/class/udc/${ro.boot.usbcontroller}/device/../mode peripheral
+import /init.recovery.qcom_decrypt.rc
