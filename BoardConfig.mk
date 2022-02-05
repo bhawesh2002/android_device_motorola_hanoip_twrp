@@ -199,4 +199,4 @@ TWRP_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true
 
 # Kernel module loading
-TW_LOAD_VENDOR_MODULES := "exfat.ko fpc1020_mmi.ko mmi_annotate.ko mmi_info.ko mmi_sys_temp.ko moto_f_usbnet.ko sensors_class.ko utags.ko"
+TW_LOAD_VENDOR_MODULES := "ilitek_v3_mmi.ko exfat.ko fpc1020_mmi.ko mmi_annotate.ko mmi_info.ko mmi_sys_temp.ko moto_f_usbnet.ko qpnp_adaptive_charge.ko sensors_class.ko utags.ko"
