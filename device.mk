@@ -26,6 +26,8 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
 # Include GSI keys
 $(call inherit-product, $(SRC_TARGET_DIR)/product/gsi_keys.mk)
 
+PLATFORM_PATH := device/motorola/hanoip
+
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
     $(LOCAL_PATH)/overlay \
@@ -118,6 +120,6 @@ PRODUCT_PACKAGES_DEBUG += \
     update_engine_client
 # OEM otacert
 PRODUCT_EXTRA_RECOVERY_KEYS += \
-    $(LOCAL_PATH)/security/ota
+    $(PLATFORM_PATH)/security/ota
 PRODUCT_COPY_FILES += \
     $(OUT_DIR)/target/product/hanoip/obj/SHARED_LIBRARIES/libandroidicu_intermediates/libandroidicu.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/libandroidicu.so
