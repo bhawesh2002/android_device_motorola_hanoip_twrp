@@ -73,7 +73,9 @@ TARGET_ENFORCE_AB_OTA_PARTITION_LIST := true
 PRODUCT_PACKAGES += \
     checkpoint_gc \
     otapreopt_script
-
+    
+PRODUCT_COPY_FILES += \
+	$(LOCAL_PATH)/recovery/root/system/etc/recovery.fstab:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/fstab.$(PRODUCT_PLATFORM)
 # Boot control
 PRODUCT_PACKAGES += \
     android.hardware.boot@1.1-impl-qti \
