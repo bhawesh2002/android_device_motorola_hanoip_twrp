@@ -26,7 +26,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
 # Include GSI keys
 $(call inherit-product, $(SRC_TARGET_DIR)/product/gsi_keys.mk)
 
-PLATFORM_PATH := device/motorola/hanoip
+DEVICE_PATH := device/motorola/hanoip
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
@@ -45,6 +45,7 @@ AB_OTA_UPDATER := true
 AB_OTA_PARTITIONS += \
     boot \
     system \
+    odm \
     vendor \
     vendor_boot \
     product \
@@ -86,7 +87,7 @@ PRODUCT_PACKAGES_DEBUG += \
 
 # Common init scripts
 PRODUCT_PACKAGES += \
-	fstab.qcom \
+	fstab.qcom
 #	ueventd.qcom.rc \
 #	init.qcom.rc \
 #	init.qcom.usb.rc
@@ -98,7 +99,8 @@ PRODUCT_PACKAGES += \
 # fastbootd
 PRODUCT_PACKAGES += \
     fastbootd
-
+PRODUCT_PACKAGES += \
+    android.hardware.keymaster@4.1-impl
 # Health
 PRODUCT_PACKAGES += \
     android.hardware.health@2.1-impl \
@@ -120,6 +122,6 @@ PRODUCT_PACKAGES_DEBUG += \
     update_engine_client
 # OEM otacert
 PRODUCT_EXTRA_RECOVERY_KEYS += \
-    $(PLATFORM_PATH)/security/ota
+    $(DEVICE_PATH)/security/ota
 PRODUCT_COPY_FILES += \
     $(OUT_DIR)/target/product/hanoip/obj/SHARED_LIBRARIES/libandroidicu_intermediates/libandroidicu.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/libandroidicu.so

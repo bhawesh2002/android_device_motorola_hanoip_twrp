@@ -25,7 +25,7 @@
 ALLOW_MISSING_DEPENDENCIES := true
 BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
 
-PLATFORM_PATH := device/motorola/hanoip
+DEVICE_PATH := device/motorola/hanoip
 # Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := sm6150
 TARGET_NO_BOOTLOADER := true
@@ -71,7 +71,7 @@ BOARD_KERNEL_OFFSET        := 0x00008000
 BOARD_RAMDISK_OFFSET       := 0x01000000
 BOARD_KERNEL_TAGS_OFFSET   := 0x00000100
 BOARD_DTB_OFFSET           := 0x01f00000
-#BOARD_KERNEL_SEPARATED_DTBO := true
+BOARD_KERNEL_SEPARATED_DTBO := true
 BOARD_INCLUDE_RECOVERY_DTBO := true
 #BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 
@@ -109,7 +109,7 @@ BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := ext4
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 
-TARGET_RECOVERY_FSTAB := $(PLATFORM_PATH)/recovery/root/system/etc/recovery.fstab
+TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
 
 # Workaround for error copying vendor files to recovery ramdisk
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
@@ -156,7 +156,7 @@ TARGET_USES_MKE2FS := true
 
 # Additional binaries & libraries needed for recovery
 TARGET_RECOVERY_DEVICE_MODULES += \
-    libandroidicu
+    libandroidicu.so
     
 # Avb
 BOARD_AVB_ENABLE := true
