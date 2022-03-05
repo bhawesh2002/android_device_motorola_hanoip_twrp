@@ -1,0 +1,10 @@
+mpq-adapter.ko
+exfat.ko
+mmi_sys_temp.ko
+sensors_class.ko
+utags.ko
+moto_f_usbnet.ko
+mmi_info.ko
+mmi_annotate.ko
+fpc1020_mmi.ko
+ilitek_v3_mmi.ko

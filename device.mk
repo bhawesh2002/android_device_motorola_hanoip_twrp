@@ -1,5 +1,5 @@
 #
-# Copyright 2020 The Android Open Source Project
+# Copyright (C) 2021 The LineageOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,81 +14,44 @@
 # limitations under the License.
 #
 
-
-# Inherit from the common Open Source product configuration
-$(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
-
 # Enable project quotas and casefolding for emulated storage without sdcardfs
 $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 
-# define hardware platform
-PRODUCT_PLATFORM := sm6150
-PLATFORM_PATH := device/motorola/hanoip
+# Enable updating of APEXes
+$(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
 
-# Dynamic partitions
-PRODUCT_USE_DYNAMIC_PARTITIONS := true
+# Enable virtual A/B OTA
+$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
 
-# A/B support
+# Include GSI keys
+$(call inherit-product, $(SRC_TARGET_DIR)/product/gsi_keys.mk)
+
+DEVICE_PATH := device/motorola/hanoip
+
+# Overlays
+DEVICE_PACKAGE_OVERLAYS += \
+    $(LOCAL_PATH)/overlay \
+    $(LOCAL_PATH)/overlay-lineage
+
+#screen size
+TARGET_SCREEN_HEIGHT := 2460
+TARGET_SCREEN_WIDTH := 1080
+
+PRODUCT_SHIPPING_API_LEVEL := 30
+
+# A/B
 AB_OTA_UPDATER := true
 
-# A/B updater updatable partitions list. Keep in sync with the partition list
-# with "_a" and "_b" variants in the device. Note that the vendor can add more
-# more partitions to this list for the bootloader and radio.
 AB_OTA_PARTITIONS += \
     boot \
-    vendor_boot \
     system \
-    vbmeta \
-    dtbo \
+    odm \
+    vendor \
+    vendor_boot \
     product \
+    vbmeta \
     vbmeta_system \
-    system_ext
-
-# Use Sdcardfs
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.sys.sdcardfs=1
-
-PRODUCT_COPY_FILES += \
-    $(PLATFORM_PATH)/fstab.qcom:$(TARGET_COPY_OUT_RECOVERY)/root/first_stage_ramdisk/fstab.$(PRODUCT_PLATFORM) \
-    $(PLATFORM_PATH)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/fstab.$(PRODUCT_PLATFORM) \
-    $(PLATFORM_PATH)/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.$(PRODUCT_PLATFORM) \
-
-# Use /product/etc/fstab.postinstall to mount system_other
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.postinstall.fstab.prefix=/product
-
-PRODUCT_COPY_FILES += \
-    $(PLATFORM_PATH)/fstab.postinstall:$(TARGET_COPY_OUT_PRODUCT)/etc/fstab.postinstall
-
-PRODUCT_COPY_FILES += \
-   	$(PLATFORM_PATH)/recovery/root/ueventd.rc:$(TARGET_COPY_OUT_VENDOR)/ueventd.rc
-
-# A/B support
-PRODUCT_PACKAGES += \
-    otapreopt_script \
-    cppreopts.sh \
-    update_engine \
-    update_verifier
-
-PRODUCT_PACKAGES += \
-    e2fsck_ramdisk \
-    tune2fs_ramdisk \
-    resize2fs_ramdisk
-
-PRODUCT_PACKAGES += \
-    bootctrl.sm6150 \
-    bootctrl.sm6150.recovery
-
-PRODUCT_PACKAGES += \
-    update_engine_sideload \
-    sg_write_buffer \
-    f2fs_io \
-    check_f2fs
-
-PRODUCT_PACKAGES_DEBUG += \
-    bootctl \
-    r.vendor \
-    update_engine_client
+    dtbo
 
 AB_OTA_POSTINSTALL_CONFIG += \
     RUN_POSTINSTALL_system=true \
@@ -96,94 +59,71 @@ AB_OTA_POSTINSTALL_CONFIG += \
     FILESYSTEM_TYPE_system=ext4 \
     POSTINSTALL_OPTIONAL_system=true
 
+AB_OTA_POSTINSTALL_CONFIG += \
+    RUN_POSTINSTALL_vendor=true \
+    POSTINSTALL_PATH_vendor=bin/checkpoint_gc \
+    FILESYSTEM_TYPE_vendor=ext4 \
+    POSTINSTALL_OPTIONAL_vendor=true
+
 # tell update_engine to not change dynamic partition table during updates
 # needed since our qti_dynamic_partitions does not include
 # vendor and odm and we also dont want to AB update them
-TARGET_ENFORCE_AB_OTA_PARTITIPLATFORM_PATHON_LIST := true
-
-# Boot control HAL
-PRODUCT_PACKAGES += \
-    android.qcom.boot@1.1-impl \
-    android.qcom.boot@1.1-service \
-    android.qcom.boot@1.1-impl-wrapper.recovery \
-    android.qcom.boot@1.1-impl-wrapper \
-    android.qcom.boot@1.1-impl.recovery \
-
-# Memtrack HAL
-PRODUCT_PACKAGES += \
-    memtrack.sm6150 \
-    android.hardware.memtrack@1.0-impl \
-    android.hardware.memtrack@1.0-service
-
-# DRM HAL
-PRODUCT_PACKAGES += \
-    android.hardware.drm@1.3-service.clearkey \
-    android.hardware.drm@1.3-service.widevine
+TARGET_ENFORCE_AB_OTA_PARTITION_LIST := true
 
 PRODUCT_PACKAGES += \
-    android.hardware.health@2.1-impl-qti \
-    android.hardware.health@2.1-service
-
-# Storage health HAL
-PRODUCT_PACKAGES += \
-<<<<<<< HEAD
-    android.hardware.health.storage@1.0
-
-PRODUCT_PACKAGES += \
-    fstab.qcom \
-
-PRODUCT_PACKAGES += \
-    fs_config_dirs \
-=======
->>>>>>> 48d3b6569f9ad45664aed8a074eab9f6ce1932e0
-    fs_config_files
-PRODUCT_PACKAGES += \
-    android.hardware.keymaster@4.1 \
-    android.hardware.identity-support-lib
- 
-# fastbootd
-PRODUCT_PACKAGES += \
-    android.hardware.fastboot@1.0-impl-mock \
-    fastbootd
-
-# Keymaster configuration
+    checkpoint_gc \
+    otapreopt_script
+    
 PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/android.software.device_id_attestation.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.device_id_attestation.xml \
+	$(LOCAL_PATH)/recovery/root/system/etc/recovery.fstab:$(TARGET_COPY_OUT_VENDOR_RAMDISK)/first_stage_ramdisk/fstab.$(PRODUCT_PLATFORM)
+# Boot control
+PRODUCT_PACKAGES += \
+    android.hardware.boot@1.1-impl-qti \
+    android.hardware.boot@1.1-impl-qti.recovery \
+    android.hardware.boot@1.1-service \
+    bootctrl.sm6150 \
+    bootctrl.sm6150.recovery
 
+PRODUCT_PACKAGES_DEBUG += \
+    bootctl
 
-# Apex libraries
-PRODUCT_HOST_PACKAGES += \
-    libandroidicu
+# Common init scripts
+PRODUCT_PACKAGES += \
+	fstab.qcom
+#	ueventd.qcom.rc \
+#	init.qcom.rc \
+#	init.qcom.usb.rc
 
-# qcom standard decryption
+#qcom standard decryption
 PRODUCT_PACKAGES += \
     qcom_decrypt \
     qcom_decrypt_fbe
-
-# Soong namespaces
-PRODUCT_SOONG_NAMESPACES += \
-    $(PLATFORM_PATH)
-
-# tzdata
+# fastbootd
 PRODUCT_PACKAGES += \
-    tzdata_twrp
+    fastbootd
+PRODUCT_PACKAGES += \
+    android.hardware.keymaster@4.1-impl
+# Health
+PRODUCT_PACKAGES += \
+    android.hardware.health@2.1-impl \
+    android.hardware.health@2.1-service
 
-# Blacklist
-PRODUCT_SYSTEM_PROPERTY_BLACKLIST += \
-    ro.bootimage.build.date.utc \
-    ro.build.date.utc
+PRODUCT_SOONG_NAMESPACES += \
+    vendor/qcom/opensource/commonsys-intf/display
 
-# Apex libraries
+PRODUCT_SOONG_NAMESPACES += \
+    $(LOCAL_PATH)
+
+# Update engine
+PRODUCT_PACKAGES += \
+    update_engine \
+    update_engine_sideload \
+    update_verifier
+
+PRODUCT_PACKAGES_DEBUG += \
+    update_engine_client
+# OEM otacert
+PRODUCT_EXTRA_RECOVERY_KEYS += \
+    $(DEVICE_PATH)/security/ota
 PRODUCT_COPY_FILES += \
-    $(OUT_DIR)/target/product/$(PRODUCT_RELEASE_NAME)/obj/SHARED_LIBRARIES/libandroidicu_intermediates/libandroidicu.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/libandroidicu.so
-
-
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.vendor.build.security_patch=2021-09-01   
-    
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.crypto.volume.filenames_mode=aes-256-cts
-
-# Storage: for factory reset protection feature
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.frp.pst=/dev/block/bootdevice/by-name/frp
+    $(OUT_DIR)/target/product/hanoip/obj/SHARED_LIBRARIES/libandroidicu_intermediates/libandroidicu.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/libandroidicu.so
